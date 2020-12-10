@@ -2,10 +2,8 @@
   "name": "automadomus-vue-app",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
-    "dev-vue-cli": "vue-cli-service serve",
-    "build": "vite build",
-    "build-vue-cli": "vue-cli-service build"
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "@ionic/vue": "^5.5.2",
@@ -13,7 +11,6 @@
     "vue-router": "^4.0.1"
   },
   "devDependencies": {
-    "vite": "^1.0.0-rc.13",
     "@vue/cli-service": "^4.5.9",
     "@vue/compiler-sfc": "^3.0.4"
   }
