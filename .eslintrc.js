@@ -31,5 +31,6 @@ module.exports = {
             named: 'never',
         }],
         'vue/no-unused-components': ['warn'],
+        'vue/comment-directive': 'off',
     },
 };
