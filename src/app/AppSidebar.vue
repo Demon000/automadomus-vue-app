@@ -48,10 +48,6 @@ import AppLogo from '@/app/AppLogo.vue';
 
 import User from '@/models/User';
 
-interface AppSidebarData {
-    user?: User;
-}
-
 export default defineComponent({
     name: 'AppSidebar',
     components: {
@@ -60,9 +56,9 @@ export default defineComponent({
         // IonIcon,
         AppLogo,
     },
-    data(): AppSidebarData {
+    data() {
         return {
-            user: undefined,
+            user: undefined as User | undefined,
         };
     },
     mounted() {
