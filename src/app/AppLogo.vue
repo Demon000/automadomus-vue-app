@@ -1,7 +1,7 @@
 <template>
     <div class="logo">
-        <span class="first-part">Automa</span>
-        <span class="second-part">Domus</span>
+        <span class="first-part">o</span>
+        <span class="second-part">domu</span>
     </div>
 </template>
 
@@ -19,10 +19,10 @@ export default defineComponent({
 }
 
 .logo .first-part {
-    color: var(--logo-first-part-color);
+    color: var(--logo-second-part-color);
 }
 
 .logo .second-part {
-    color: var(--logo-second-part-color);
+    color: var(--logo-first-part-color);
 }
 </style>
