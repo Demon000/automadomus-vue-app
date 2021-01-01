@@ -4,22 +4,28 @@
             v-bind:class="{
                 'focused': focused,
                 'outline': outline,
+                'floating-label': floatingLabel,
             }"
     >
-        <label>
-            <span
-                    class="mdd-input-label"
-                    v-if="label"
-            >
-                {{ label }}
-            </span>
-            <input
-                    class="mdd-input-field"
-                    type="text"
-                    v-on:focus="onInputFocus"
-                    v-on:blur="onInputBlur"
-            >
-        </label>
+        <div class="border">
+            <div class="left"></div>
+            <div class="middle">
+                <span
+                        class="label"
+                        v-if="label"
+                >
+                    {{ label }}
+                </span>
+            </div>
+            <div class="right"></div>
+        </div>
+        <input
+                class="field"
+                type="text"
+                v-model="inputValue"
+                @focus="onInputFocus"
+                @blur="onInputBlur"
+        >
     </div>
 </template>
 
@@ -37,11 +43,34 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        modelValue: {
+            type: String,
+            default: '',
+        },
+    },
+    emits: [
+        'update:modelValue',
+    ],
+    computed: {
+        inputValue: {
+            get(): string {
+                return this.modelValue;
+            },
+            set(value: string) {
+                this.$emit('update:modelValue', value);
+            },
+        },
+        floatingLabel(): boolean {
+            return this.focused || !!this.modelValue;
+        },
     },
     data() {
         return {
             focused: false,
         };
+    },
+    mounted() {
+        this.inputValue = '';
     },
     methods: {
         onInputFocus() {
@@ -56,42 +85,128 @@ export default defineComponent({
 
 <style scoped>
 .mdd-input {
+    --height: var(--mdd-input-height, 56px);
+
+    --border-color: var(--mdd-input-border-color, rgba(0, 0, 0, 0.45));
+    --border-color-hovered: var(--mdd-input-border-color-hovered, rgba(0, 0, 0, 0.87));
+    --border-color-focused: var(--mdd-input-border-color-focused, #0070ff);
+    --border-color-effective: var(--border-color);
+
+    --border-width: var(--mdd-input-border-width, 1px);
+    --border-width-focused: var(--mdd-input-border-width-focused, 2px);
+    --border-width-effective: var(--border-width);
+
+    --border-radius: var(--mdd-input-border-radius, 4px);
+
+    --top-padding: var(--mdd-input-top-padding, 20px);
+    --side-padding: var(--mdd-input-side-padding, 16px);
+    --bottom-padding: var(--mdd-input-bottom-padding, 20px);
+    --label-side-padding: var(--mdd-input-label-side-padding, 4px);
+
     position: relative;
 
-    box-sizing: border-box;
-}
-.mdd-input.outline {
-    --top-padding: 12px;
-    --side-padding: 16px;
+    margin: 2em 0;
 }
 
-.mdd-input-label {
+.mdd-input:hover {
+    --border-color-effective: var(--border-color-hovered);
+}
+
+.mdd-input.focused {
+    --border-color-effective: var(--border-color-focused);
+    --border-width-effective: var(--border-width-focused);
+}
+
+.border {
     position: absolute;
-}
-.mdd-input.outline .mdd-input-label {
-    line-height: 1.875;
-    font-size: 1em;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
 
+    display: flex;
+
+    pointer-events: none;
+}
+
+.border .left,
+.border .right,
+.border .middle {
+    box-sizing: border-box;
+
+    border-radius: var(--border-radius);
+    border: var(--border-width-effective) solid var(--border-color-effective);
+    color: var(--border-color-effective);
+
+    --border-transition: 0.125s border-color ease-out;
+    transition: var(--border-transition);
+}
+
+.border .left {
+    width: calc(var(--side-padding) - var(--label-side-padding));
+
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+}
+
+.border .middle {
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+
+    position: relative;
+
+    padding: 0 var(--label-side-padding);
+}
+
+.floating-label .border .middle {
+    border-top-width: 0;
+}
+
+.border .middle .label {
+    display: block;
+
+    position: relative;
     top: var(--top-padding);
-    left: var(--side-padding);
+
+    line-height: 1em;
+    height: 1em;
 
     transition:
-            0.25s line-height ease-out,
-            0.25s font-size ease-out,
-            0.25s top ease-out;
-}
-.mdd-input.outline.focused .mdd-input-label {
-    line-height: 0.85;
-    font-size: 0.85em;
-
-    top: -0.425em;
+            0.125s top ease-out,
+            0.125s color ease-out,
+            0.125s font-size ease-out;
 }
 
-.mdd-input-field {
-    line-height: 1.875;
-    padding: var(--top-padding) var(--side-padding) 14px;
+.floating-label .border .middle .label {
+    top: -0.5em;
+
+    font-size: 0.75em;
+
+    color: var(--border-color-effective);
+}
+
+.border .right {
+    flex-grow: 1;
+
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+}
+
+.field {
+    display: block;
+
+    font-size: 1em;
+
+    box-sizing: border-box;
+    height: calc(var(--top-padding) + var(--bottom-padding) + 1em);
+    padding: var(--top-padding) var(--side-padding) var(--bottom-padding);
 
     width: 100%;
     outline: 0 solid transparent;
+    background: transparent;
+    border: 0;
 }
 </style>
