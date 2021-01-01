@@ -1,10 +1,10 @@
 <template>
     <div class="login-card">
         <mdd-input
-            :outline="true"
-            label="Username"
-            v-model="username"
-            @keyup.enter="onLoginButtonClick"
+                :outline="true"
+                label="Username"
+                v-model="username"
+                @keyup.enter="onLoginButtonClick"
         ></mdd-input>
 
         <mdd-input
