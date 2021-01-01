@@ -16,7 +16,7 @@ export default class AreaRepository {
         this._store = store;
     }
 
-    getAreasPage(page = 0, limit = 0): Array<Area> {
+    getAreasPaginated(page = 0, limit = 0): Array<Area> {
         return this._store.getters.areas
             .filter((area: Area) => {
                 const offlineFlags = area.offlineFlags || 0;

@@ -61,6 +61,15 @@ async function redirectToIndex() {
     });
 }
 
+async function redirectToAreaDetails(area: Area) {
+    await _router.replace({
+        name: _RouteNames.AREA_DETAILS,
+        params: {
+            areaId: area.id,
+        },
+    });
+}
+
 userService.emitter.on(
     UserServiceEvent.USER_GET_LOGGED_IN_ERROR,
     createErrorToast,
@@ -79,21 +88,11 @@ areaService.emitter.on(AreaServiceEvent.AREA_UPDATED, async (area: Area) => {
         return;
     }
 
-    await _router.replace({
-        name: _RouteNames.AREA_DETAILS,
-        params: {
-            areaId: area.id,
-        },
-    });
+    await redirectToAreaDetails(area);
 });
 
-areaService.emitter.on(AreaServiceEvent.AREA_ADDED, async () => {
-    await _router.replace({
-        name: _RouteNames.AREAS,
-        query: {
-            page: 0,
-        },
-    });
+areaService.emitter.on(AreaServiceEvent.AREA_ADDED, async (area: Area) => {
+    await redirectToAreaDetails(area);
 });
 
 areaService.emitter.on(

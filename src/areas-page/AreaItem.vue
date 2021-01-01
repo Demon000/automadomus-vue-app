@@ -1,5 +1,13 @@
 <template>
     <div class="area-item">
+        <template v-if="area">
+            <mdd-list-item
+                    :header="area.name"
+                    :subheader="areaCategoryText"
+            >
+            </mdd-list-item>
+        </template>
+
         <!--        <ion-card>-->
         <!--            <ion-card-header>-->
         <!--                <ion-card-title>{{ name }}</ion-card-title>-->
@@ -14,24 +22,30 @@
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
 
+import MddListItem from '@/mdd-components/MddListItem.vue';
+
 export default defineComponent({
     name: 'AreaItem',
     components: {
+        MddListItem,
     // IonCard,
     // IonCardHeader,
     // IonCardTitle,
     // IonCardSubtitle,
     },
     props: {
-        id: String,
-        name: String,
-        category: Number,
-        hasImage: Boolean,
-        withDetails: Boolean,
+        area: {
+            type: Object,
+            default: null,
+        },
     },
     computed: {
-        categoryText(): string | undefined {
-            return areaService.getAreaCategoryText(this.category);
+        areaCategoryText(): string | undefined {
+            if (!this.area) {
+                return undefined;
+            }
+
+            return areaService.getAreaCategoryText(this.area.category);
         },
     },
 });
@@ -39,5 +53,6 @@ export default defineComponent({
 
 <style scoped>
 .area-item {
+    cursor: pointer;
 }
 </style>

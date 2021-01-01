@@ -3,32 +3,44 @@
         <app-sidebar></app-sidebar>
         <app-navbar :has-menu-button="true" title="Areas">
             <template v-slot:actions>
-                <i class="action-icon mdi mdi-plus" v-on:click="onAddButtonClick"></i>
+                <i
+                        class="action-icon mdi mdi-plus"
+                        @click="onAddButtonClick"
+                ></i>
             </template>
         </app-navbar>
-        <div id="areas-content">
+        <div class="areas-content">
             <template
-                v-for="item in items"
-                v-bind:key="item.id"
+                    v-for="item in items"
+                    :key="item.id"
             >
                 <area-item
-                    v-bind="item"
-                    class="area-item"
-                    v-on:click="openAreaDetailsPage(item.id)"
+                        class="area-item"
+                        :area="item"
+                        v-on:click="onAreaItemClick(item.id)"
                 ></area-item>
             </template>
+
+            <infinite-scroll-bottom-detector
+                    @visibility-change="onScrolledToBottom"
+            ></infinite-scroll-bottom-detector>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+
+import { areaService, RouteNames } from '@/dependencies';
+import { CONFIG_AREAS_PAGINATED_LIMIT } from '@/config';
+
+import Area from '@/models/Area';
+
+import InfiniteScrollBottomDetector from '@/util-components/infinite-scroll/InfiniteScrollBottomDetector.vue';
+
 import AppNavbar from '@/app/AppNavbar.vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AreaItem from '@/areas-page/AreaItem.vue';
-import { areaService, RouteNames } from '@/dependencies';
-import Area from '@/models/Area';
-import { CONFIG_AREAS_PAGINATED_LIMIT } from '@/config';
 
 export default defineComponent({
     name: 'AreasPage',
@@ -36,43 +48,75 @@ export default defineComponent({
         AppSidebar,
         AppNavbar,
         AreaItem,
-    },
-    props: {
-        page: {
-            type: Number,
-            default: 0,
-            required: false,
-        },
+        InfiniteScrollBottomDetector,
     },
     data() {
         return {
             items: [] as Array<Area>,
-            noPages: 0,
+            page: -1,
             RouteNames: RouteNames,
+            scrolledToBottom: false,
         };
     },
-    watch: {
-        page() {
-            this.reloadItems();
-        },
-    },
     mounted() {
-        this.reloadItems();
+        this.resetLoadedPages();
+        this.loadNextPageUntilNotScrolledToBottom();
     },
     methods: {
-        async reloadItems() {
-            const items = await areaService.getAreasPage(
-                this.page,
+        async loadItemsPage(page = 0): Promise<boolean> {
+            console.log('loading page ' + page);
+
+            const items = await areaService.getOrLoadAreasPage(
+                page,
                 CONFIG_AREAS_PAGINATED_LIMIT,
             );
-            if (!items) {
+
+            console.log(items);
+
+            if (!items || !items.length) {
+                return false;
+            }
+
+            this.items = this.items.concat(items);
+
+            return true;
+        },
+        async resetLoadedPages() {
+            this.page = -1;
+            this.items = [];
+        },
+        async loadNextPage(): Promise<boolean> {
+            const hasLoadedAnything = await this.loadItemsPage(this.page + 1);
+            if (!hasLoadedAnything) {
+                return false;
+            }
+
+            this.page++;
+
+            return hasLoadedAnything;
+        },
+        async loadNextPageUntilNotScrolledToBottom() {
+            if (!this.scrolledToBottom) {
                 return;
             }
 
-            this.items = items;
+            const hasLoadedAnything = await this.loadNextPage();
+            if (!hasLoadedAnything) {
+                return;
+            }
+
+            setTimeout(this.loadNextPageUntilNotScrolledToBottom, 0);
         },
-        async openAreaDetailsPage(areaId: string) {
-            this.$router.push({
+        onScrolledToBottom(status: boolean) {
+            this.scrolledToBottom = status;
+            if (!status) {
+                return;
+            }
+
+            this.loadNextPageUntilNotScrolledToBottom();
+        },
+        async onAreaItemClick(areaId: string) {
+            await this.$router.push({
                 name: RouteNames.AREA_DETAILS,
                 params: {
                     areaId,
@@ -89,11 +133,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#areas-content {
+.areas-page {
     overflow: auto;
+    height: 100%;
 }
 
 .area-item {
     cursor: pointer;
+}
+
+.areas-content {
+    overflow: auto;
+    height: 100%;
 }
 </style>

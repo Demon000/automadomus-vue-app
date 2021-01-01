@@ -22,9 +22,6 @@ const _router = createRouter({
             name: _RouteNames.INDEX,
             redirect: {
                 name: _RouteNames.AREAS,
-                query: {
-                    page: 0,
-                },
             },
         },
         {
@@ -36,16 +33,6 @@ const _router = createRouter({
             path: '/areas',
             name: _RouteNames.AREAS,
             component: AreasPage,
-            props: route => {
-                let page = 0;
-                if (route.query.page) {
-                    page = parseInt(route.query.page as string);
-                }
-
-                return {
-                    page,
-                };
-            },
         },
         {
             path: '/area-details/:areaId',

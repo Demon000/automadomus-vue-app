@@ -1,5 +1,5 @@
 <template>
-    <div class="app-content">
+    <div id="app-content">
         <router-view></router-view>
     </div>
 </template>
@@ -7,14 +7,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import LoginPage from '@/login-page/LoginPage.vue';
 import { areaService } from '@/dependencies';
 
 export default defineComponent({
     name: 'App',
-    components: {
-        LoginPage,
-    },
     async mounted() {
         await areaService.getAreaCategories();
     },
@@ -35,15 +31,10 @@ export default defineComponent({
 
     --logo-first-part-color: #111111;
     --logo-second-part-color: #0070ff;
-
-    --pagination-page-bg-color: #eeeeee;
-    --pagination-page-hover-bg-color: #e0e0e0;
-    --pagination-page-disabled-fg-color: #777777;
 }
 
-#app,
 #app-content {
     overflow: auto;
-    min-height: 100%;
+    height: 100%;
 }
 </style>

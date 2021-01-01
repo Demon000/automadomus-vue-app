@@ -16,6 +16,7 @@ import UserRepository from '@/repositories/UserRepository';
 export enum AreaServiceEvent {
     AREA_GET_CATEGORIES_ERROR = 'area-get-categories-error',
     AREA_GET_PAGE_ERROR = 'area-get-page-error',
+    AREA_GET_PAGE_NETWORK_ERROR = 'area-get-page-network-error',
     AREA_GET_DETAILS_ERROR = 'area-get-details-error',
     AREA_ADDED = 'area-added',
     AREA_ADD_ERROR = 'area-add-error',
@@ -65,12 +66,16 @@ export default class AreaService {
         return this._areaRepository.getAreaCategoryText(value);
     }
 
-    async getAreasPage(page = 0, limit = 0): Promise<Array<Area> | undefined> {
+    async getOrLoadAreasPage(page = 0, limit = 0): Promise<Array<Area> | false> {
         try {
             const areasPage = await this._areasApi.areasGetPage(page, limit);
 
             if (page === 0) {
                 this._areaRepository.clearAreasDetailsMap();
+            }
+
+            if (!areasPage.noItems) {
+                return false;
             }
 
             for (const area of areasPage.items) {
@@ -79,11 +84,16 @@ export default class AreaService {
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_GET_PAGE_ERROR, err);
-                return;
+                return false;
             }
         }
 
-        return this._areaRepository.getAreasPage(page, limit);
+        const areas = this._areaRepository.getAreasPaginated(page, limit);
+        if (!areas) {
+            return false;
+        }
+
+        return areas;
     }
 
     async getAreaDetails(id: string): Promise<Area | undefined> {
