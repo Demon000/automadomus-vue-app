@@ -4,12 +4,15 @@
             :outline="true"
             label="Username"
             v-model="username"
+            @keyup.enter="onLoginButtonClick"
         ></mdd-input>
 
         <mdd-input
                 :outline="true"
                 label="Password"
+                type="password"
                 v-model="password"
+                @keyup.enter="onLoginButtonClick"
         ></mdd-input>
 
         <mdd-fab

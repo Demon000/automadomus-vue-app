@@ -21,7 +21,7 @@
         </div>
         <input
                 class="field"
-                type="text"
+                :type="type"
                 v-model="inputValue"
                 @focus="onInputFocus"
                 @blur="onInputBlur"
@@ -46,6 +46,10 @@ export default defineComponent({
         modelValue: {
             type: String,
             default: '',
+        },
+        type: {
+            type: String,
+            default: 'text',
         },
     },
     emits: [
