@@ -3,12 +3,14 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
     name: 'MddIcon',
     props: {
         name: String,
     },
-};
+});
 </script>
 
 <style scoped>

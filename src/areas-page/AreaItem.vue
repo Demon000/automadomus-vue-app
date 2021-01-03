@@ -1,11 +1,11 @@
 <template>
     <div class="area-item">
         <template v-if="area">
-            <mdd-list-item
+            <mdd-card
                     :header="area.name"
                     :subheader="areaCategoryText"
             >
-            </mdd-list-item>
+            </mdd-card>
         </template>
 
         <!--        <ion-card>-->
@@ -23,11 +23,12 @@ import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
 
 import MddListItem from '@/mdd-components/MddListItem.vue';
+import MddCard from '@/mdd-components/MddCard.vue';
 
 export default defineComponent({
     name: 'AreaItem',
     components: {
-        MddListItem,
+        MddCard,
     // IonCard,
     // IonCardHeader,
     // IonCardTitle,

@@ -9,15 +9,19 @@ export enum APIEvents {
 
 export default class API {
     public baseRequest: AxiosInstance;
+    public uninterceptedBaseRequest: AxiosInstance;
     public emitter: EventEmitter;
 
     constructor(baseURL: string) {
         this.emitter = new EventEmitter();
 
-        this.baseRequest = axios.create({
+        const baseRequestConfig = {
             baseURL,
             withCredentials: true,
-        });
+        };
+
+        this.baseRequest = axios.create(baseRequestConfig);
+        this.uninterceptedBaseRequest = axios.create(baseRequestConfig);
 
         this.baseRequest.interceptors.request.use(
             (config: AxiosRequestConfig) => {

@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import MddIcon from '@/mdd-components/MddIcon';
+import MddIcon from '@/mdd-components/MddIcon.vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -30,13 +30,13 @@ export default defineComponent({
     },
     computed: {
         hasIconAndTitle(): boolean {
-            return this.icon && this.title;
+            return !!this.icon && !!this.title;
         },
         hasIconOnly(): boolean {
-            return this.icon && !this.title;
+            return !!this.icon && !this.title;
         },
         hasTitleOnly(): boolean {
-            return this.title && !this.icon;
+            return !!this.title && !this.icon;
         },
     },
     props: {
@@ -52,7 +52,7 @@ export default defineComponent({
 
     --height: var(--mdd-fab-height, 48px);
     --icon-height: var(--mdd-fab-icon-height, 24px);
-    --background: var(--mdd-fab-background, #0070ff);
+    --bg: var(--mdd-fab-bg, #0070ff);
     --color: var(--mdd-fab-color, #ffffff);
 
     box-sizing: border-box;
@@ -63,7 +63,7 @@ export default defineComponent({
     border-radius: calc(var(--height) / 2);
     padding: calc((var(--height) - var(--icon-height)) / 2) var(--icon-height);
 
-    background: var(--background);
+    background: var(--bg);
     color: var(--color);
 
     box-shadow:

@@ -1,5 +1,5 @@
 <template>
-    <div class="area-details-page">
+    <div class="area-details-page page">
         <app-sidebar></app-sidebar>
         <app-navbar :has-back-button="true" title="Add area">
             <template v-slot:actions>
@@ -94,6 +94,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import '../app/page.css';
+
 .property {
     margin: 8px 0;
 }

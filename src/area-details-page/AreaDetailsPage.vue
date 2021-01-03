@@ -14,30 +14,34 @@
                 ></i>
             </template>
         </app-navbar>
-        <!--        <ion-card v-if="area">-->
-        <!--            <ion-card-content>-->
-        <!--                <div class="property">-->
-        <!--                    <div class="type">Owner</div>-->
-        <!--                    <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>-->
-        <!--                </div>-->
-        <!--                <div class="property">-->
-        <!--                    <div class="type">Location</div>-->
-        <!--                    <div class="value">{{ area.location }}</div>-->
-        <!--                </div>-->
-        <!--                <div class="property">-->
-        <!--                    <div class="type">Category</div>-->
-        <!--                    <div class="value">{{ areaCategoryText }}</div>-->
-        <!--                </div>-->
-        <!--                <div class="property">-->
-        <!--                    <div class="type">Number of devices</div>-->
-        <!--                    <div class="value">{{ area.noDevices }}</div>-->
-        <!--                </div>-->
-        <!--                <div class="property">-->
-        <!--                    <div class="type">Number of controllers</div>-->
-        <!--                    <div class="value">{{ area.noControllers }}</div>-->
-        <!--                </div>-->
-        <!--            </ion-card-content>-->
-        <!--        </ion-card>-->
+        <div
+                class="area-details-content"
+                v-if="area"
+        >
+            <div
+                    class="property"
+                    v-if="area.owner"
+            >
+                <div class="type">Owner</div>
+                <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>
+            </div>
+            <div class="property">
+                <div class="type">Location</div>
+                <div class="value">{{ area.location }}</div>
+            </div>
+            <div class="property">
+                <div class="type">Category</div>
+                <div class="value">{{ areaCategoryText }}</div>
+            </div>
+            <div class="property">
+                <div class="type">Number of devices</div>
+                <div class="value">{{ area.noDevices }}</div>
+            </div>
+            <div class="property">
+                <div class="type">Number of controllers</div>
+                <div class="value">{{ area.noControllers }}</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -123,12 +127,18 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.area-details-content {
+    padding: 16px;
+}
+
 .property {
-    margin: 8px 0;
+    margin-bottom: 8px;
 }
 
 .property .type {
     color: rgba(0, 0, 0, 0.5);
+    font-size: 0.875em;
+    margin-bottom: 4px;
 }
 
 .property .value {

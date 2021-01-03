@@ -82,7 +82,9 @@ export default class AreaService {
                 this._areaRepository.setAreaDetails(area);
             }
         } catch (err) {
-            if (!isNetworkError(err)) {
+            if (isNetworkError(err)) {
+                this.emitter.emit(AreaServiceEvent.AREA_GET_PAGE_NETWORK_ERROR);
+            } else {
                 this.emitter.emit(AreaServiceEvent.AREA_GET_PAGE_ERROR, err);
                 return false;
             }

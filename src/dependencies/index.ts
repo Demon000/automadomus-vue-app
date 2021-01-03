@@ -5,7 +5,7 @@ import { CONFIG_API_BASE_URL } from '@/config';
 import _store, { _StoreMutations } from '@/dependencies/_store';
 import _router, { _RouteNames } from '@/dependencies/_router';
 
-import API from '@/api/API';
+import API, { APIEvents } from '@/api/API';
 import UserAPI from '@/api/UserAPI';
 import UserRepository from '@/repositories/UserRepository';
 import UserService, { UserServiceEvent } from '@/services/UserService';
@@ -14,19 +14,21 @@ import AreasAPI from '@/api/AreasAPI';
 import AreaRepository from '@/repositories/AreaRepository';
 import AreaService, { AreaServiceEvent } from '@/services/AreaService';
 import Area from '@/models/Area';
-import NetworkTracker from '@/network-tracker/NetworkTracker';
+import NetworkTrackingService from '@/services/NetworkTrackingService';
 import { AxiosError } from 'axios';
-
-const networkTracker = new NetworkTracker();
+import PingAPI from '@/api/PingAPI';
 
 const _api = new API(CONFIG_API_BASE_URL);
 
+const _pingApi = new PingAPI(_api);
 const _userApi = new UserAPI(_api);
 const _userRepository = new UserRepository(_store);
 const userService = new UserService(_userApi, _userRepository);
 
 const _areasApi = new AreasAPI(_api);
 const _areaRepository = new AreaRepository(_store);
+
+const networkTrackingService = new NetworkTrackingService(_pingApi);
 const areaService = new AreaService(
     _areasApi,
     _areaRepository,
@@ -69,6 +71,14 @@ async function redirectToAreaDetails(area: Area) {
         },
     });
 }
+
+_api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
+    try {
+        networkTrackingService.checkServerConnection();
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 userService.emitter.on(
     UserServiceEvent.USER_GET_LOGGED_IN_ERROR,
@@ -129,7 +139,7 @@ _router.beforeEach(async (to, from, next) => {
 });
 
 export {
-    networkTracker,
+    networkTrackingService,
     userService,
     areaService,
     _store as store,

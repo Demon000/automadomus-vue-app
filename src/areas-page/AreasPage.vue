@@ -1,5 +1,5 @@
 <template>
-    <div class="areas-page">
+    <div class="areas-page page">
         <app-sidebar></app-sidebar>
         <app-navbar :has-menu-button="true" title="Areas">
             <template v-slot:actions>
@@ -64,14 +64,10 @@ export default defineComponent({
     },
     methods: {
         async loadItemsPage(page = 0): Promise<boolean> {
-            console.log('loading page ' + page);
-
             const items = await areaService.getOrLoadAreasPage(
                 page,
                 CONFIG_AREAS_PAGINATED_LIMIT,
             );
-
-            console.log(items);
 
             if (!items || !items.length) {
                 return false;
@@ -133,10 +129,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.areas-page {
-    overflow: auto;
-    height: 100%;
-}
+@import '../app/page.css';
 
 .area-item {
     cursor: pointer;

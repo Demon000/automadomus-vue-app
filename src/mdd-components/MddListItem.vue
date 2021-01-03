@@ -44,13 +44,13 @@ export default defineComponent({
 .mdd-list-item {
     --border-color: var(--mdd-list-item-border-color, rgba(0, 0, 0, 0.12));
     --subheader-color: var(--mdd-list-item-subheader-color, rgba(0, 0, 0, 0.54));
-    --hover-background: var(--mdd-list-item-hover-background, rgba(0, 0, 0, 0.04));
-    --active-background: var(--mdd-list-item-focus-background, rgba(0, 0, 0, 0.08));
+    --hover-bg: var(--mdd-list-item-hover-bg, rgba(0, 0, 0, 0.04));
+    --active-bg: var(--mdd-list-item-focus-bg, rgba(0, 0, 0, 0.08));
     --top-padding: var(--mdd-list-item-top-padding, 16px);
-    --side-padding: var(--mdd-list-item-side-padding, 16px);
+    --horizontal-padding: var(--mdd-list-item-horizontal-padding, 16px);
     --bottom-padding: var(--mdd-list-item-bottom-padding, 16px);
 
-    padding: var(--top-padding) var(--side-padding) var(--bottom-padding);
+    padding: var(--top-padding) var(--horizontal-padding) var(--bottom-padding);
 
     transition: 0.125s background ease-out;
 
@@ -62,11 +62,11 @@ export default defineComponent({
 }
 
 .mdd-list-item:hover {
-    background: var(--hover-background);
+    background: var(--hover-bg);
 }
 
 .mdd-list-item:active {
-    background: var(--active-background);
+    background: var(--active-bg);
 }
 
 .header,

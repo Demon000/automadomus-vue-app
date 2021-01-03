@@ -25,7 +25,8 @@ export default defineComponent({
     --menu-bottom-border-color: #eeeeee;
 
     --navbar-bg-color: #eeeeee;
-    --navbar-area-action-button-bg-color: #e0e0e0;
+    --navbar-action-button-hover-bg: rgba(0, 0, 0, 0.04);
+    --navbar-action-button-active-bg: rgba(0, 0, 0, 0.08);
 
     --shade-color: #e0e0e0;
 

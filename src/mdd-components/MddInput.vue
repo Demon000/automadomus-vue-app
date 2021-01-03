@@ -105,9 +105,9 @@ export default defineComponent({
     --border-radius: var(--mdd-input-border-radius, 4px);
 
     --top-padding: var(--mdd-input-top-padding, 20px);
-    --side-padding: var(--mdd-input-side-padding, 16px);
+    --horizontal-padding: var(--mdd-input-horizontal-padding, 16px);
     --bottom-padding: var(--mdd-input-bottom-padding, 20px);
-    --label-side-padding: var(--mdd-input-label-side-padding, 4px);
+    --label-horizontal-padding: var(--mdd-input-label-horizontal-padding, 4px);
 
     position: relative;
 
@@ -149,7 +149,7 @@ export default defineComponent({
 }
 
 .border .left {
-    width: calc(var(--side-padding) - var(--label-side-padding));
+    width: calc(var(--horizontal-padding) - var(--label-horizontal-padding));
 
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -163,7 +163,7 @@ export default defineComponent({
 
     position: relative;
 
-    padding: 0 var(--label-side-padding);
+    padding: 0 var(--label-horizontal-padding);
 }
 
 .floating-label .border .middle {
@@ -208,7 +208,7 @@ export default defineComponent({
 
     box-sizing: border-box;
     height: calc(var(--top-padding) + var(--bottom-padding) + 1em);
-    padding: var(--top-padding) var(--side-padding) var(--bottom-padding);
+    padding: var(--top-padding) var(--horizontal-padding) var(--bottom-padding);
 
     width: 100%;
     outline: 0 solid transparent;
