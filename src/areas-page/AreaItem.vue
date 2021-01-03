@@ -7,22 +7,13 @@
             >
             </mdd-card>
         </template>
-
-        <!--        <ion-card>-->
-        <!--            <ion-card-header>-->
-        <!--                <ion-card-title>{{ name }}</ion-card-title>-->
-        <!--                <ion-card-subtitle>{{ categoryText }}</ion-card-subtitle>-->
-        <!--            </ion-card-header>-->
-        <!--        </ion-card>-->
     </div>
 </template>
 
 <script lang="ts">
-// import {IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle} from '@ionic/vue';
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
 
-import MddListItem from '@/mdd-components/MddListItem.vue';
 import MddCard from '@/mdd-components/MddCard.vue';
 
 export default defineComponent({

@@ -2,46 +2,54 @@
     <div class="area-details-page">
         <app-sidebar></app-sidebar>
         <app-navbar :has-back-button="true" :title="area ? area.name : ''">
-            <template v-slot:actions>
-                <i
-                    class="action-icon mdi mdi-pencil"
-                    v-on:click="onEditButtonClick"
-                ></i>
+            <template v-slot:end>
+                <mdd-icon
+                        name="mdi mdi-pencil"
+                        @click="onEditButtonClick"
+                >
+                </mdd-icon>
 
-                <i
-                    class="action-icon mdi mdi-delete"
-                    v-on:click="onDeleteButtonClick"
-                ></i>
+                <mdd-icon
+                        name="mdi mdi-delete"
+                        @click="onDeleteButtonClick"
+                >
+                </mdd-icon>
             </template>
         </app-navbar>
-        <div
-                class="area-details-content"
-                v-if="area"
-        >
-            <div
-                    class="property"
-                    v-if="area.owner"
+        <mdd-card>
+            <template
+                    v-if="area"
+                    v-slot:content
             >
-                <div class="type">Owner</div>
-                <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>
-            </div>
-            <div class="property">
-                <div class="type">Location</div>
-                <div class="value">{{ area.location }}</div>
-            </div>
-            <div class="property">
-                <div class="type">Category</div>
-                <div class="value">{{ areaCategoryText }}</div>
-            </div>
-            <div class="property">
-                <div class="type">Number of devices</div>
-                <div class="value">{{ area.noDevices }}</div>
-            </div>
-            <div class="property">
-                <div class="type">Number of controllers</div>
-                <div class="value">{{ area.noControllers }}</div>
-            </div>
-        </div>
+                <div
+                        class="area-details-content"
+                >
+                    <div
+                            class="property"
+                            v-if="area.owner"
+                    >
+                        <div class="type">Owner</div>
+                        <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>
+                    </div>
+                    <div class="property">
+                        <div class="type">Location</div>
+                        <div class="value">{{ area.location }}</div>
+                    </div>
+                    <div class="property">
+                        <div class="type">Category</div>
+                        <div class="value">{{ areaCategoryText }}</div>
+                    </div>
+                    <div class="property">
+                        <div class="type">Number of devices</div>
+                        <div class="value">{{ area.noDevices }}</div>
+                    </div>
+                    <div class="property">
+                        <div class="type">Number of controllers</div>
+                        <div class="value">{{ area.noControllers }}</div>
+                    </div>
+                </div>
+            </template>
+        </mdd-card>
     </div>
 </template>
 
@@ -52,12 +60,16 @@ import AppNavbar from '@/app/AppNavbar.vue';
 // import {IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle} from '@ionic/vue';
 import { areaService, RouteNames } from '@/dependencies';
 import Area from '@/models/Area';
+import MddCard from '@/mdd-components/MddCard.vue';
+import MddIcon from '@/mdd-components/MddIcon.vue';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
     components: {
         AppSidebar,
         AppNavbar,
+        MddCard,
+        MddIcon,
     // IonCard,
     // IonCardHeader,
     // IonCardTitle,

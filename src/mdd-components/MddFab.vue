@@ -9,7 +9,7 @@
     >
         <mdd-icon
                 v-if="icon"
-                name="mdi mdi-login"
+                :name="icon"
                 class="icon"
         >
         </mdd-icon>

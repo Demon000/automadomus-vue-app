@@ -1,11 +1,37 @@
 <template>
     <div class="area-details-page">
         <app-sidebar></app-sidebar>
-        <app-navbar :has-back-button="true" :title="`Update area ${areaName}`">
-            <template v-slot:actions>
-                <i class="action-icon mdi mdi-check" v-on:click="onSaveButtonClick"></i>
+        <app-navbar
+                :has-back-button="true"
+                :title="`Update area ${areaName}`"
+        >
+            <template v-slot:end>
+                <mdd-icon
+                        name="mdi mdi-check"
+                        @click="onSaveButtonClick"
+                ></mdd-icon>
             </template>
         </app-navbar>
+        <div class="area-details-content">
+            <mdd-card>
+                <template v-slot:content>
+                    <mdd-input
+                            label="Name"
+                            v-model="area.name"
+                    ></mdd-input>
+
+                    <mdd-input
+                            label="Category"
+                            v-model="area.category"
+                    ></mdd-input>
+
+                    <mdd-input
+                            label="Location"
+                            v-model="area.location"
+                    ></mdd-input>
+                </template>
+            </mdd-card>
+        </div>
         <!--        <ion-card v-if="area">-->
         <!--            <ion-card-content>-->
         <!--                <ion-item>-->
@@ -47,12 +73,18 @@ import AppNavbar from '@/app/AppNavbar.vue';
 // } from '@ionic/vue';
 import { areaService } from '@/dependencies';
 import { AreaCategoriesMap } from '@/models/Area';
+import MddIcon from '@/mdd-components/MddIcon.vue';
+import MddCard from '@/mdd-components/MddCard.vue';
+import MddInput from '@/mdd-components/MddInput.vue';
 
 export default defineComponent({
     name: 'AreaUpdatePage',
     components: {
         AppSidebar,
         AppNavbar,
+        MddIcon,
+        MddCard,
+        MddInput,
     // IonCard,
     // IonCardHeader,
     // IonCardTitle,

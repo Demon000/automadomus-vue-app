@@ -1,6 +1,6 @@
 <template>
     <div
-            class="mdd-list-item list-item-like"
+            class="mdd-list-item mdd-list-item-like"
             :class="{
                 'with-border': withBorder,
             }"
@@ -41,7 +41,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import './list-item-like.css';
+@import 'mdd-list-item-like.css';
 
 .mdd-list-item {
     --border-color: var(--mdd-list-item-border-color, rgba(0, 0, 0, 0.12));

@@ -1,5 +1,9 @@
 <template>
     <div
+            class="bottom-detector"
+            :style="{
+                height: detection,
+            }"
             v-observe-visibility="{
                 callback: onVisibilityChange,
                 throttle: debounce,
@@ -17,6 +21,10 @@ export default defineComponent({
             type: Number,
             default: 0,
         },
+        detection: {
+            type: String,
+            default: '4px',
+        },
     },
     emits: [
         'visibilityChange',
@@ -28,3 +36,9 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+.bottom-detector {
+    height: 2px;
+}
+</style>

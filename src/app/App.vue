@@ -20,13 +20,14 @@ export default defineComponent({
 <style>
 :root {
     --accent-color: #0070ff;
-    --ion-color-primary: var(--accent-color);
 
     --menu-bottom-border-color: #eeeeee;
 
-    --navbar-bg-color: #eeeeee;
-    --navbar-action-button-hover-bg: rgba(0, 0, 0, 0.04);
-    --navbar-action-button-active-bg: rgba(0, 0, 0, 0.08);
+    --navbar-bg-color: var(--accent-color);
+    --navbar-fg-color: rgba(255, 255, 255, 1);
+    --navbar-network-tracker-fg-color: rgba(255, 255, 255, 0.87);
+    --navbar-action-button-hover-bg: rgba(255, 255, 255, 0.08);
+    --navbar-action-button-active-bg: rgba(255, 255, 255, 0.16);
 
     --shade-color: #e0e0e0;
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="app-navbar">
+    <div class="app-navbar mdd-elevation-2">
         <div class="top">
             <div class="start">
                 <mdd-icon
@@ -75,8 +75,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import '../mdd-components/mdd-elevation-shadow.css';
+
 .app-navbar {
     --bg: var(--navbar-bg-color, #000000);
+    --fg: var(--navbar-fg-color, #ffffff);
     --horizontal-padding: var(--navbar-horizontal-padding, 16px);
     --line-height: var(--navbar-line-height, 36px);
     --vertical-padding: var(--navbar-vertical-padding, 10px);
@@ -86,6 +89,7 @@ export default defineComponent({
     line-height: var(--line-height);
     padding: var(--vertical-padding) var(--horizontal-padding);
 
+    color: var(--fg);
     background: var(--bg);
 }
 
@@ -104,7 +108,7 @@ export default defineComponent({
     font-size: 20px;
 }
 
-.mdd-icon {
+.app-navbar::v-deep(.mdd-icon) {
     padding: 6px;
     margin-left: -6px;
     margin-right: 6px;
@@ -114,24 +118,21 @@ export default defineComponent({
     cursor: pointer;
 
     transition: 0.125s background ease-out;
-
-    --hover-bg: var(--navbar-action-button-hover-bg);
-    --active-bg: var(--navbar-action-button-active-bg);
 }
 
-.mdd-icon:hover {
-    background: var(--hover-bg);
+.app-navbar::v-deep(.mdd-icon:hover) {
+    background: var(--navbar-action-button-hover-bg);
 }
 
-.mdd-icon:active {
-    background: var(--active-bg);
+.app-navbar::v-deep(.mdd-icon:active) {
+    background: var(--navbar-action-button-active-bg);
 }
 
 .sub {
     font-size: 14px;
     line-height: 16px;
 
-    color: rgba(0, 0, 0, 0.57);
+    color: var(--navbar-network-tracker-fg-color);
 
     display: flex;
     justify-content: center;

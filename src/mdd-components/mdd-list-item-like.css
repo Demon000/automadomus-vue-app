@@ -1,0 +1,23 @@
+.mdd-list-item-like {
+    --subheader-color: var(--mdd-list-item-subheader-color, rgba(0, 0, 0, 0.54));
+}
+
+.mdd-list-item-like .header,
+.mdd-list-item-like .subheader {
+    vertical-align: bottom;
+}
+
+.mdd-list-item-like .header {
+    margin-bottom: 0.25em;
+
+    font-size: 1.3125em;
+    line-height: 1.375em;
+    vertical-align: bottom;
+}
+
+.mdd-list-item-like .subheader {
+    line-height: 1em;
+    font-size: 0.925em;
+
+    color: var(--subheader-color);
+}

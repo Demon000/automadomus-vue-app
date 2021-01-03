@@ -1,10 +1,10 @@
 <template>
     <div
             class="mdd-input"
-            v-bind:class="{
+            :class="{
                 'focused': focused,
                 'outline': outline,
-                'floating-label': floatingLabel,
+                'floating-label': isLabelFloating,
             }"
     >
         <div class="border">
@@ -21,21 +21,52 @@
             </div>
             <div class="right"></div>
         </div>
-        <input
-                class="field"
-                :type="type"
-                v-model="inputValue"
-                @focus="onInputFocus"
-                @blur="onInputBlur"
-        >
+        <div class="field-container">
+            <div class="before-field">
+            </div>
+            <div
+                    class="field"
+                    :class="{
+                        'select': isSelect,
+                    }"
+                    v-if="isSelect"
+            >
+                {{ inputValue }}
+            </div>
+            <input
+                    class="field"
+                    :type="type"
+                    v-model="inputValue"
+                    @focus="onInputFocus"
+                    @blur="onInputBlur"
+                    v-else
+            >
+            <div class="after-field">
+                <template v-if="isSelect">
+                    <mdd-icon
+                            v-if="focused"
+                            name="mdi mdi-menu-up"
+                    ></mdd-icon>
+                    <mdd-icon
+                            v-else
+                            name="mdi mdi-menu-down"
+                    ></mdd-icon>
+                </template>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import MddIcon from '@/mdd-components/MddIcon.vue';
+
 export default defineComponent({
     name: 'MddInput',
+    components: {
+        MddIcon,
+    },
     props: {
         label: {
             type: String,
@@ -46,12 +77,25 @@ export default defineComponent({
             default: false,
         },
         modelValue: {
+            default: '',
+        },
+        iconBefore: {
+            type: String,
+            default: '',
+        },
+        iconAfter: {
             type: String,
             default: '',
         },
         type: {
             type: String,
             default: 'text',
+        },
+        options: {
+            type: Object,
+            default: () => {
+                return {};
+            },
         },
     },
     emits: [
@@ -66,8 +110,11 @@ export default defineComponent({
                 this.$emit('update:modelValue', value);
             },
         },
-        floatingLabel(): boolean {
+        isLabelFloating(): boolean {
             return this.focused || !!this.modelValue;
+        },
+        isSelect(): boolean {
+            return this.type === 'select';
         },
     },
     data() {
@@ -111,7 +158,7 @@ export default defineComponent({
 
     position: relative;
 
-    margin: 2em 0;
+    margin-top: 0.375em;
 }
 
 .mdd-input:hover {
@@ -201,6 +248,10 @@ export default defineComponent({
     border-left-width: 0;
 }
 
+.field-container {
+    display: flex;
+}
+
 .field {
     display: block;
 
@@ -214,5 +265,17 @@ export default defineComponent({
     outline: 0 solid transparent;
     background: transparent;
     border: 0;
+}
+
+.field.select {
+    padding-right: 0;
+}
+
+.before-field {
+    padding-left: 16px;
+}
+
+.after-field {
+    padding-right: 16px;
 }
 </style>
