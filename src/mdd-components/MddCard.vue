@@ -1,6 +1,6 @@
 <template>
     <div
-            class="mdd-card"
+            class="mdd-card list-item-like"
             :class="{
                 'elevation-1': elevation === 1,
                 'elevation-2': elevation === 2,
@@ -55,6 +55,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import './list-item-like.css';
+
 .mdd-card {
     --margin: var(--mdd-card-margin, 16px);
     --padding: var(--mdd-card-padding, 8px);

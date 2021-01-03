@@ -1,6 +1,6 @@
 <template>
     <div
-            class="mdd-list-item"
+            class="mdd-list-item list-item-like"
             :class="{
                 'with-border': withBorder,
             }"
@@ -41,9 +41,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import './list-item-like.css';
+
 .mdd-list-item {
     --border-color: var(--mdd-list-item-border-color, rgba(0, 0, 0, 0.12));
-    --subheader-color: var(--mdd-list-item-subheader-color, rgba(0, 0, 0, 0.54));
     --hover-bg: var(--mdd-list-item-hover-bg, rgba(0, 0, 0, 0.04));
     --active-bg: var(--mdd-list-item-focus-bg, rgba(0, 0, 0, 0.08));
     --top-padding: var(--mdd-list-item-top-padding, 16px);
@@ -67,23 +68,5 @@ export default defineComponent({
 
 .mdd-list-item:active {
     background: var(--active-bg);
-}
-
-.header,
-.subheader {
-    vertical-align: bottom;
-}
-
-.header {
-    margin-bottom: 0.25em;
-
-    line-height: 1em;
-}
-
-.subheader {
-    line-height: 1em;
-    font-size: 0.875em;
-
-    color: var(--subheader-color);
 }
 </style>
