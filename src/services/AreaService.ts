@@ -91,7 +91,7 @@ export default class AreaService {
             }
         }
 
-        const areas = this.areaRepository.getAreasPaginated(page, limit, false);
+        const areas = this.areaRepository.getAreasPaginated(page, limit);
         if (!areas) {
             return false;
         }
