@@ -6,22 +6,22 @@
                     outlined
             >
                 <ui-card-content
-                        class="area-item-card__content"
+                        class="content"
                 >
                     <div
-                            class="area-item-card__name"
+                            class="name"
                             :class="$tt('headline5')"
                     >
                         {{ area.name }}
                     </div>
                     <div
-                            class="area-item-card__category_text"
+                            class="category_text"
                             :class="$tt('subtitle1')"
                     >
                         {{ areaCategoryText }}
                     </div>
                     <div
-                            class="area-item-card__offline-marker"
+                            class="offline-marker"
                             v-if="
                                 hasOfflineFlag(AreaOfflineFlags.ADDED
                                 | AreaOfflineFlags.UPDATED
@@ -86,11 +86,11 @@ export default defineComponent({
     margin: 16px;
 }
 
-.area-item-card__content {
+.content {
     padding: 16px;
 }
 
-.area-item-card__offline-marker {
+.offline-marker {
     position: absolute;
     right: 16px;
     top: 16px;
@@ -98,11 +98,11 @@ export default defineComponent({
     display: flex;
 }
 
-.area-item-card__offline-marker.deleted {
+.offline-marker.deleted {
     color: #b00020;
 }
 
-.area-item-card__offline-marker .mdc-icon-button {
+.offline-marker .mdc-icon-button {
     width: 24px;
     height: 24px;
     font-size: 24px;

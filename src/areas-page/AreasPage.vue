@@ -33,7 +33,6 @@
                         class="search-field"
                 >
                     <ui-textfield
-                            class="search-field__ui-textfield"
                             fullwidth
                             v-model="searchText"
                             @keyup.enter="onSearchTextSubmit"
@@ -43,7 +42,7 @@
                 </div>
             </template>
         </app-navbar>
-        <div class="areas-content">
+        <div class="content">
             <template
                     v-for="item in items"
                     :key="item.id"
@@ -185,7 +184,7 @@ export default defineComponent({
     cursor: pointer;
 }
 
-.areas-content {
+.content {
     overflow: auto;
     height: 100%;
 }

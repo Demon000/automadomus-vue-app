@@ -18,10 +18,10 @@
             </template>
         </app-navbar>
         <ui-card
-                class="area-details-card"
+                class="card"
                 outlined
         >
-            <div class="area-details-card__content">
+            <div class="content">
                 <template
                     v-if="area"
                 >
@@ -169,11 +169,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.area-details-card {
+.card {
     margin: 16px;
 }
 
-.area-details-card__content {
+.content {
     padding: 16px;
 }
 

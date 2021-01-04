@@ -14,10 +14,10 @@
             </template>
         </app-navbar>
         <ui-card
-                class="area-add-card"
+                class="card"
                 outlined
         >
-            <div class="area-add-card__content">
+            <div class="content">
                 <ui-textfield
                         class="ui-textfield"
                         fullwidth
@@ -188,11 +188,11 @@ export default defineComponent({
 <style scoped>
 @import '../app/page.css';
 
-.area-add-card {
+.card {
     margin: 16px;
 }
 
-.area-add-card__content {
+.content {
     padding: 16px;
 }
 
