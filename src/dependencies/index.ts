@@ -1,6 +1,5 @@
 import { CONFIG_API_BASE_URL } from '@/config';
 
-
 import _store, { _StoreMutations } from '@/dependencies/_store';
 import _router, { _RouteNames } from '@/dependencies/_router';
 
@@ -42,12 +41,7 @@ async function createErrorToast(err: Error) {
         message += response.data.message;
     }
 
-    // const toast = await toastController
-    //     .create({
-    //         message: message,
-    //         duration: 2000,
-    //     });
-    // return toast.present();
+    console.error(message);
 }
 
 async function redirectToLogin() {

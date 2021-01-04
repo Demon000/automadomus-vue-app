@@ -11,6 +11,13 @@ module.exports = {
             filename: 'index.html',
         },
     },
+    // configureWebpack: {
+    //     resolve: {
+    //         alias: {
+    //             vue: 'vue/dist/vue.esm-bundler.js',
+    //         },
+    //     },
+    // },
     devServer: {
         https: true,
         cert: fs.readFileSync('../odomu-certs/cert.pem'),
