@@ -17,7 +17,7 @@ module.exports = {
         key: fs.readFileSync('../odomu-certs/key.pem'),
     },
     chainWebpack: config => {
-        config.resolve.symlinks(false);
+        config.optimization.delete('splitChunks');
     },
     // css: {
     //     loaderOptions: {
