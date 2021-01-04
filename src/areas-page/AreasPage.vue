@@ -11,10 +11,36 @@
         >
             <template #toolbar>
                 <ui-icon-button
+                        v-model="isSearchFieldVisible"
+                >
+                    <template #default="{ onClass, offClass }">
+                        <i class="mdi mdi-magnify" :class="offClass"></i>
+                        <i class="mdi mdi-close" :class="onClass"></i>
+                    </template>
+                </ui-icon-button>
+                <ui-icon-button
                         @click="onAddButtonClick"
                 >
                     <i class="mdi mdi-plus"></i>
                 </ui-icon-button>
+            </template>
+
+            <template
+                    #sub
+                    v-if="isSearchFieldVisible"
+            >
+                <div
+                        class="search-field"
+                >
+                    <ui-textfield
+                            class="search-field__ui-textfield"
+                            fullwidth
+                            v-model="searchText"
+                            @keyup.enter="onSearchTextSubmit"
+                    >
+                        Search
+                    </ui-textfield>
+                </div>
             </template>
         </app-navbar>
         <div class="areas-content">
@@ -66,6 +92,7 @@ export default defineComponent({
             RouteNames: RouteNames,
             scrolledToBottom: false,
             searchText: '',
+            isSearchFieldVisible: false,
         };
     },
     mounted() {
@@ -161,5 +188,11 @@ export default defineComponent({
 .areas-content {
     overflow: auto;
     height: 100%;
+}
+
+.search-field {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 16px 4px;
 }
 </style>

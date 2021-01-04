@@ -44,6 +44,15 @@
                         v-model="editedArea.location"
                 >
                     Location
+                    <template #after>
+                        <ui-textfield-icon>
+                            <ui-icon-button
+                                @click="onOpenMapButtonClick"
+                            >
+                                <i class="mdi mdi-map-marker"></i>
+                            </ui-icon-button>
+                        </ui-textfield-icon>
+                    </template>
                 </ui-textfield>
             </div>
         </ui-card>
@@ -168,6 +177,9 @@ export default defineComponent({
             } else {
                 await this.onSaveAddButtonClick();
             }
+        },
+        async onOpenMapButtonClick(): Promise<void> {
+            console.log('bla');
         },
     },
 });

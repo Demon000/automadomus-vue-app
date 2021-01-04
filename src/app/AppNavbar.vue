@@ -16,15 +16,6 @@
             </template>
 
             <template #toolbar="{ toolbarItemClass }">
-                <ui-icon-button
-                        v-model="isSearchFieldVisible"
-                        v-if="hasSearchBar"
-                >
-                    <template #default="{ onClass, offClass }">
-                        <i class="mdi mdi-magnify" :class="offClass"></i>
-                        <i class="mdi mdi-close" :class="onClass"></i>
-                    </template>
-                </ui-icon-button>
                 <slot
                         name="toolbar"
                         v-bind="{
@@ -35,19 +26,7 @@
             </template>
         </ui-top-app-bar>
         <div class="sub">
-            <div
-                    class="search-field"
-                    v-if="isSearchFieldVisible"
-            >
-                <ui-textfield
-                        class="search-field__ui-textfield"
-                        fullwidth
-                        v-model="searchTextInput"
-                        @keyup.enter="onSearchTextSubmit"
-                >
-                    Search
-                </ui-textfield>
-            </div>
+            <slot name="sub"></slot>
             <div
                     class="network-status"
                     v-if="!networkStatus"
@@ -75,33 +54,13 @@ export default defineComponent({
     props: {
         title: String,
         hasBackButton: Boolean,
-        hasSearchBar: Boolean,
         contentSelector: String,
-        searchText: {
-            type: String,
-            default: '',
-        },
     },
-    emits: [
-        'searchTextSubmit',
-        'update:searchText',
-    ],
     data() {
         return {
-            isSearchFieldVisible: false,
             networkStatus: true as boolean,
             networkStatusCheckTime: 0 as number,
         };
-    },
-    computed: {
-        searchTextInput: {
-            get(): string {
-                return this.searchText;
-            },
-            set(value: string) {
-                this.$emit('update:searchText', value);
-            },
-        },
     },
     async mounted() {
         networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, this.onNetworkStateChange, this);
@@ -113,9 +72,6 @@ export default defineComponent({
     methods: {
         async onBackButtonClick() {
             await this.$router.go(-1);
-        },
-        onSearchTextSubmit() {
-            this.$emit('searchTextSubmit');
         },
         onNetworkStateChange() {
             this.networkStatusCheckTime = networkTrackingService.getCheckTimeMs() / 1000;
@@ -143,12 +99,6 @@ export default defineComponent({
     flex-direction: column;
 
     cursor: pointer;
-}
-
-.search-field {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 0 16px 4px;
 }
 
 .network-status {
