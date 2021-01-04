@@ -22,7 +22,14 @@
                     </div>
                     <div
                             class="area-item-card__offline-marker"
-                            v-if="area.offlineFlags"
+                            v-if="
+                                hasOfflineFlag(AreaOfflineFlags.ADDED
+                                | AreaOfflineFlags.UPDATED
+                                | AreaOfflineFlags.DELETED)
+                            "
+                            :class="{
+                                'deleted': hasOfflineFlag(AreaOfflineFlags.DELETED),
+                            }"
                     >
                         <ui-icon-button>
                             <i class="mdi mdi-sync-alert"></i>
@@ -37,14 +44,21 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
+import { AreaOfflineFlags } from '@/repositories/AreaRepository';
+import Area from '@/models/Area';
 
 export default defineComponent({
     name: 'AreaItem',
     props: {
         area: {
-            type: Object,
-            default: null,
+            type: Object as () => Area,
+            default: undefined,
         },
+    },
+    data() {
+        return {
+            AreaOfflineFlags,
+        };
     },
     computed: {
         areaCategoryText(): string | undefined {
@@ -53,6 +67,11 @@ export default defineComponent({
             }
 
             return areaService.getAreaCategoryText(this.area.category);
+        },
+    },
+    methods: {
+        hasOfflineFlag(flag: number): boolean {
+            return areaService.hasAreaOfflineFlag(this.area, flag);
         },
     },
 });
@@ -77,6 +96,10 @@ export default defineComponent({
     top: 16px;
 
     display: flex;
+}
+
+.area-item-card__offline-marker.deleted {
+    color: #b00020;
 }
 
 .area-item-card__offline-marker .mdc-icon-button {

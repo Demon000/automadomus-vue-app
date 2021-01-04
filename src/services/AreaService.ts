@@ -90,7 +90,7 @@ export default class AreaService {
             }
         }
 
-        const areas = this.areaRepository.getAreasPaginated(page, limit);
+        const areas = this.areaRepository.getAreasPaginated(page, limit, false);
         if (!areas) {
             return false;
         }
@@ -180,8 +180,8 @@ export default class AreaService {
         return true;
     }
 
-    hasAreaOfflineFlag(area: Area, flag: number): boolean {
-        return area.offlineFlags !== undefined && !!(area.offlineFlags & flag);
+    hasAreaOfflineFlag(area: Area | undefined, flag: number): boolean {
+        return area !== undefined && area.offlineFlags !== undefined && !!(area.offlineFlags & flag);
     }
 
     canDeleteLocallyOnly(id: string): boolean {

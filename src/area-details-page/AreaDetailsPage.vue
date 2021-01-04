@@ -55,17 +55,32 @@
                     </div>
                     <div
                             class="property"
-                            v-if="area.noDevices"
+                            v-if="area.noDevices !== undefined"
                     >
                         <div class="type">Number of devices</div>
                         <div class="value">{{ area.noDevices }}</div>
                     </div>
                     <div
                             class="property"
-                            v-if="area.noControllers"
+                            v-if="area.noDevices !== undefined"
                     >
                         <div class="type">Number of controllers</div>
                         <div class="value">{{ area.noControllers }}</div>
+                    </div>
+
+                    <div class="property">
+                        <div class="type">Added offline</div>
+                        <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.ADDED) }}</div>
+                    </div>
+
+                    <div class="property">
+                        <div class="type">Updated offline</div>
+                        <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.UPDATED) }}</div>
+                    </div>
+
+                    <div class="property">
+                        <div class="type">Deleted offline</div>
+                        <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.DELETED) }}</div>
                     </div>
                 </template>
             </div>
@@ -79,6 +94,7 @@ import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
 import { areaService, RouteNames } from '@/dependencies';
 import Area from '@/models/Area';
+import { AreaOfflineFlags } from '@/repositories/AreaRepository';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
@@ -99,6 +115,7 @@ export default defineComponent({
     data() {
         return {
             area: undefined as Area | undefined,
+            AreaOfflineFlags,
         };
     },
     computed: {
@@ -143,6 +160,9 @@ export default defineComponent({
             await this.$router.push({
                 name: RouteNames.AREAS,
             });
+        },
+        hasOfflineFlag(flag: number): boolean {
+            return areaService.hasAreaOfflineFlag(this.area, flag);
         },
     },
 });
