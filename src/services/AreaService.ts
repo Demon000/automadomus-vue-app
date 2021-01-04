@@ -71,7 +71,7 @@ export default class AreaService {
         try {
             const areasPage = await this.areasAPI.areasGetPage(page, limit);
 
-            if (page === 0) {
+            if (page === 0 && !searchText) {
                 this.areaRepository.clearAreasDetailsMap();
             }
 
