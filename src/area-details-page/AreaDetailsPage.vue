@@ -126,7 +126,7 @@ export default defineComponent({
                 return;
             }
 
-            await this.$router.replace({
+            await this.$router.push({
                 name: RouteNames.AREA_EDIT,
                 params: {
                     areaId: this.area.id,
