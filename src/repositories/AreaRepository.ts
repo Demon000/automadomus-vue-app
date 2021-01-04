@@ -16,13 +16,20 @@ export default class AreaRepository {
         this.store = store;
     }
 
-    getAreasPaginated(page = 0, limit = 0, filterDeleted = true): Array<Area> {
+    getAreasPaginated(page = 0, limit = 0, filterDeleted = true, searchText = ''): Array<Area> {
         let areas = this.store.getters.areas;
 
         if (filterDeleted) {
             areas = areas.filter((area: Area) => {
                 const offlineFlags = area.offlineFlags || 0;
                 return !(offlineFlags & AreaOfflineFlags.DELETED);
+            });
+        }
+
+        if (searchText) {
+            const lowerSearchText = searchText.toLowerCase();
+            areas = areas.filter((area: Area) => {
+                return area.name.toLowerCase().includes(lowerSearchText);
             });
         }
 

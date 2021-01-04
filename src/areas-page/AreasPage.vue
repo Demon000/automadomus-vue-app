@@ -5,6 +5,9 @@
                 contentSelector=".areas-content"
                 title="Areas"
                 :has-menu-button="true"
+                :has-search-bar="true"
+                v-model:search-text="searchText"
+                @searchTextSubmit="onSearchTextSubmit"
         >
             <template #toolbar>
                 <ui-icon-button
@@ -62,6 +65,7 @@ export default defineComponent({
             page: -1,
             RouteNames: RouteNames,
             scrolledToBottom: false,
+            searchText: '',
         };
     },
     mounted() {
@@ -73,10 +77,14 @@ export default defineComponent({
         areaService.emitter.off(AreaServiceEvent.SYNC_DONE, this.onSyncDone);
     },
     methods: {
-        async loadItemsPage(page = 0): Promise<boolean> {
+        onSearchTextSubmit() {
+            this.reloadPages();
+        },
+        async loadItemsPage(page = 0, searchText = ''): Promise<boolean> {
             const items = await areaService.getOrLoadAreasPage(
                 page,
                 CONFIG_AREAS_PAGINATED_LIMIT,
+                searchText,
             );
 
             if (!items || !items.length) {
@@ -88,7 +96,7 @@ export default defineComponent({
             return true;
         },
         async loadNextPage(): Promise<boolean> {
-            const hasLoadedAnything = await this.loadItemsPage(this.page + 1);
+            const hasLoadedAnything = await this.loadItemsPage(this.page + 1, this.searchText);
             if (!hasLoadedAnything) {
                 return false;
             }
