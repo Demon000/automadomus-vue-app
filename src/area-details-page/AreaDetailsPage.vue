@@ -2,7 +2,7 @@
     <div class="area-details-page">
         <app-sidebar></app-sidebar>
         <app-navbar
-                :has-back-button="true"
+                has-back-button
                 :title="area ? area.name : ''">
             <template #toolbar>
                 <ui-icon-button

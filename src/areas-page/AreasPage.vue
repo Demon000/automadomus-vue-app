@@ -4,8 +4,8 @@
         <app-navbar
                 contentSelector=".areas-content"
                 title="Areas"
-                :has-menu-button="true"
-                :has-search-bar="true"
+                has-menu-button
+                has-search-bar
                 v-model:search-text="searchText"
                 @searchTextSubmit="onSearchTextSubmit"
         >
