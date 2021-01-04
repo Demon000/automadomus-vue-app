@@ -113,7 +113,7 @@ export default class AreaService {
         return this.areaRepository.getAreaDetails(id);
     }
 
-    async addArea(data: AreaAddData, fromSync = false): Promise<boolean> {
+    async addArea(data: AreaAddData, handleNetworkError = true, emitEvent = true): Promise<boolean> {
         let areaResponse;
 
         try {
@@ -125,7 +125,7 @@ export default class AreaService {
                 return false;
             }
 
-            if (fromSync) {
+            if (!handleNetworkError) {
                 return false;
             }
 
@@ -139,18 +139,19 @@ export default class AreaService {
 
         const area = this.areaRepository.getAreaDetails(areaResponse.id);
 
-        if (!fromSync) {
+        if (emitEvent) {
             this.emitter.emit(AreaServiceEvent.AREA_ADDED, area);
         }
 
-        if (!fromSync && area && area.offlineFlags) {
+        if (emitEvent && area && area.offlineFlags) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
 
         return true;
     }
 
-    async updateArea(id: string, data: AreaUpdateData, fromSync = false): Promise<boolean> {
+    async updateArea(id: string, data: AreaUpdateData, handleNetworkError = true,
+        emitEvent = true): Promise<boolean> {
         try {
             const areaResponse = await this.areasAPI.areasPatchArea(id, data);
             this.areaRepository.setAreaDetails(areaResponse);
@@ -160,7 +161,7 @@ export default class AreaService {
                 return false;
             }
 
-            if (fromSync) {
+            if (!handleNetworkError) {
                 return false;
             }
 
@@ -169,11 +170,11 @@ export default class AreaService {
 
         const area = this.areaRepository.getAreaDetails(id);
 
-        if (!fromSync) {
+        if (emitEvent) {
             this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
         }
 
-        if (!fromSync && area && area.offlineFlags) {
+        if (emitEvent && area && area.offlineFlags) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
 
@@ -189,7 +190,7 @@ export default class AreaService {
         return !!area && this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
     }
 
-    async deleteArea(id: string, fromSync = false): Promise<boolean> {
+    async deleteArea(id: string, handleNetworkError = true, emitEvent = true): Promise<boolean> {
         let offlineModifications = false;
 
         try {
@@ -204,7 +205,7 @@ export default class AreaService {
                 return false;
             }
 
-            if (fromSync) {
+            if (!handleNetworkError) {
                 return false;
             }
 
@@ -212,11 +213,11 @@ export default class AreaService {
             offlineModifications = true;
         }
 
-        if (!fromSync) {
+        if (emitEvent) {
             this.emitter.emit(AreaServiceEvent.AREA_DELETED, id);
         }
 
-        if (!fromSync && offlineModifications) {
+        if (emitEvent && offlineModifications) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
 
@@ -233,18 +234,18 @@ export default class AreaService {
             let success = false;
 
             if (isDeleted) {
-                success = await this.deleteArea(area.id, true);
+                success = await this.deleteArea(area.id, false, true);
             } else if (isAdded) {
-                success = await this.addArea(area, true);
+                success = await this.addArea(area, false, false);
             } else if (isUpdated) {
-                success = await this.updateArea(area.id, area, true);
+                success = await this.updateArea(area.id, area, false, false);
             }
 
             if (!success) {
                 continue;
             }
 
-            if (isDeleted || isUpdated) {
+            if (isUpdated) {
                 this.areaRepository.clearAreaDetailsOfflineFlags(area.id);
             } else if (isAdded) {
                 await this.deleteArea(area.id);
