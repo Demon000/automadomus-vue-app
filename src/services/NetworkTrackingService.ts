@@ -4,14 +4,14 @@ import PingAPI from '@/api/PingAPI';
 
 type NetworkTrackerCallback = (status: boolean) => void;
 
-enum NetworkTrackerEvent {
+export enum NetworkTrackerEvent {
     STATUS_CHANGE = 'status-change',
 }
 
 export default class NetworkTrackingService {
-    private emitter = new EventEmitter();
-    private pingApi: PingAPI;
+    public emitter = new EventEmitter();
 
+    private pingApi: PingAPI;
     private checkStartTimeMs = 1000;
     private checkTimeMs = this.checkStartTimeMs;
     private checkTimeoutId: number | null = null;
@@ -19,18 +19,6 @@ export default class NetworkTrackingService {
 
     constructor(pingApi: PingAPI) {
         this.pingApi = pingApi;
-    }
-
-    on(fn: NetworkTrackerCallback, callWithCurrent = true): void {
-        this.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, fn);
-
-        if (callWithCurrent) {
-            fn(this.status);
-        }
-    }
-
-    off(fn: NetworkTrackerCallback): void {
-        this.emitter.off(NetworkTrackerEvent.STATUS_CHANGE, fn);
     }
 
     getStatus(): boolean {

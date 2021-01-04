@@ -27,24 +27,43 @@
                 >
                     <div
                             class="property"
+                            v-if="area.id"
+                    >
+                        <div class="type">Id</div>
+                        <div class="value">{{ area.id }}</div>
+                    </div>
+                    <div
+                            class="property"
                             v-if="area.owner"
                     >
                         <div class="type">Owner</div>
                         <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>
                     </div>
-                    <div class="property">
+                    <div
+                            class="property"
+                            v-if="area.owner"
+                    >
                         <div class="type">Location</div>
                         <div class="value">{{ area.location }}</div>
                     </div>
-                    <div class="property">
+                    <div
+                            class="property"
+                            v-if="areaCategoryText"
+                    >
                         <div class="type">Category</div>
                         <div class="value">{{ areaCategoryText }}</div>
                     </div>
-                    <div class="property">
+                    <div
+                            class="property"
+                            v-if="area.noDevices"
+                    >
                         <div class="type">Number of devices</div>
                         <div class="value">{{ area.noDevices }}</div>
                     </div>
-                    <div class="property">
+                    <div
+                            class="property"
+                            v-if="area.noControllers"
+                    >
                         <div class="type">Number of controllers</div>
                         <div class="value">{{ area.noControllers }}</div>
                     </div>

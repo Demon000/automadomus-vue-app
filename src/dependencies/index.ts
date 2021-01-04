@@ -14,7 +14,7 @@ import AreasAPI from '@/api/AreasAPI';
 import AreaRepository from '@/repositories/AreaRepository';
 import AreaService, { AreaServiceEvent } from '@/services/AreaService';
 import Area from '@/models/Area';
-import NetworkTrackingService from '@/services/NetworkTrackingService';
+import NetworkTrackingService, { NetworkTrackerEvent } from '@/services/NetworkTrackingService';
 import { AxiosError } from 'axios';
 import PingAPI from '@/api/PingAPI';
 
@@ -78,6 +78,15 @@ _api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
     } catch (err) {
         console.error(err);
     }
+});
+
+networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () => {
+    const status = networkTrackingService.getStatus();
+    if (!status) {
+        return;
+    }
+
+    await areaService.syncOfflineChanges();
 });
 
 userService.emitter.on(

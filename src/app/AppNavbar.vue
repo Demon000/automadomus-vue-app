@@ -42,6 +42,7 @@
 import { defineComponent } from 'vue';
 
 import { networkTrackingService } from '@/dependencies';
+import { NetworkTrackerEvent } from '@/services/NetworkTrackingService';
 
 export default defineComponent({
     name: 'AppNavbar',
@@ -58,10 +59,11 @@ export default defineComponent({
         };
     },
     async mounted() {
-        networkTrackingService.on(this.onNetworkStateChange, true);
+        networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, this.onNetworkStateChange, this);
+        this.onNetworkStateChange();
     },
     beforeUnmount() {
-        networkTrackingService.off(this.onNetworkStateChange);
+        networkTrackingService.emitter.off(NetworkTrackerEvent.STATUS_CHANGE, this.onNetworkStateChange);
     },
     methods: {
         async onBackButtonClick() {
@@ -81,5 +83,19 @@ export default defineComponent({
 <style scoped>
 .ui-top-app-bar {
     position: initial;
+}
+
+.sub {
+    font-size: 14px;
+    line-height: 20px;
+    vertical-align: middle;
+
+    color: var(--navbar-network-tracker-fg-color);
+    background: var(--navbar-bg-color);
+
+    display: flex;
+    justify-content: center;
+
+    cursor: pointer;
 }
 </style>

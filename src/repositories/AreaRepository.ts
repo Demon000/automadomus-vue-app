@@ -10,14 +10,14 @@ export enum AreaOfflineFlags {
 }
 
 export default class AreaRepository {
-    private _store: Store<StoreState>;
+    private store: Store<StoreState>;
 
     constructor(store: Store<StoreState>) {
-        this._store = store;
+        this.store = store;
     }
 
     getAreasPaginated(page = 0, limit = 0): Array<Area> {
-        return this._store.getters.areas
+        return this.store.getters.areas
             .filter((area: Area) => {
                 const offlineFlags = area.offlineFlags || 0;
                 return !(offlineFlags & AreaOfflineFlags.DELETED);
@@ -28,16 +28,23 @@ export default class AreaRepository {
             .slice(page * limit, (page + 1) * limit);
     }
 
+    getOfflineChangedAreas(): Array<Area> {
+        return this.store.getters.areas
+            .filter((area: Area) => {
+                return !!area.offlineFlags;
+            });
+    }
+
     clearAreasDetailsMap(): void {
-        this._store.commit(StoreMutations.CLEAR_AREAS_DETAILS_MAP);
+        this.store.commit(StoreMutations.CLEAR_AREAS_DETAILS_MAP);
     }
 
     getAreaDetails(id: string): Area {
-        return this._store.getters.getAreaDetails(id);
+        return this.store.getters.getAreaDetails(id);
     }
 
     setAreaDetails(area: Area): void {
-        this._store.commit(StoreMutations.SET_AREA_DETAILS, area);
+        this.store.commit(StoreMutations.SET_AREA_DETAILS, area);
     }
 
     addAreaOffline(area: Area): void {
@@ -46,7 +53,7 @@ export default class AreaRepository {
         }
         area.offlineFlags |= AreaOfflineFlags.ADDED;
 
-        this._store.commit(StoreMutations.SET_AREA_DETAILS, area);
+        this.store.commit(StoreMutations.SET_AREA_DETAILS, area);
     }
 
     updateAreaDetailsOffline(id: string, data: AreaUpdateData): void {
@@ -55,11 +62,14 @@ export default class AreaRepository {
         }
         data.offlineFlags |= AreaOfflineFlags.UPDATED;
 
-        this._store.commit(StoreMutations.SET_AREA_DETAILS, data);
+        this.store.commit(StoreMutations.SET_AREA_DETAILS, {
+            id,
+            ...data,
+        });
     }
 
     deleteAreaDetails(id: string): void {
-        return this._store.commit(StoreMutations.DELETE_AREA_DETAILS, id);
+        return this.store.commit(StoreMutations.DELETE_AREA_DETAILS, id);
     }
 
     deleteAreaDetailsOffline(id: string): void {
@@ -72,14 +82,14 @@ export default class AreaRepository {
     }
 
     setAreaCategories(categories: AreaCategoriesMap): void {
-        this._store.commit(StoreMutations.SET_AREA_CATEGORIES, categories);
+        this.store.commit(StoreMutations.SET_AREA_CATEGORIES, categories);
     }
 
     getAreaCategories(): AreaCategoriesMap {
-        return this._store.getters.areaCategories;
+        return this.store.getters.areaCategories;
     }
 
     getAreaCategoryText(value: number): string {
-        return this._store.getters.getAreaCategoryText(value);
+        return this.store.getters.getAreaCategoryText(value);
     }
 }

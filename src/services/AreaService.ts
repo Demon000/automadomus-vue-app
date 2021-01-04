@@ -29,25 +29,25 @@ export enum AreaServiceEvent {
 
 export default class AreaService {
     public emitter: EventEmitter;
-    private _areasApi: AreasAPI;
-    private _areaRepository: AreaRepository;
-    private _userRepository: UserRepository;
+    private areasAPI: AreasAPI;
+    private areaRepository: AreaRepository;
+    private userRepository: UserRepository;
 
     constructor(
         areasApi: AreasAPI,
         areaRepository: AreaRepository,
         userRepository: UserRepository,
     ) {
-        this._areasApi = areasApi;
-        this._areaRepository = areaRepository;
-        this._userRepository = userRepository;
+        this.areasAPI = areasApi;
+        this.areaRepository = areaRepository;
+        this.userRepository = userRepository;
         this.emitter = new EventEmitter();
     }
 
     async getAreaCategories(): Promise<AreaCategoriesMap | undefined> {
         try {
-            const categories = await this._areasApi.areasGetCategories();
-            this._areaRepository.setAreaCategories(categories);
+            const categories = await this.areasAPI.areasGetCategories();
+            this.areaRepository.setAreaCategories(categories);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_GET_CATEGORIES_ERROR, err);
@@ -55,7 +55,7 @@ export default class AreaService {
             }
         }
 
-        return this._areaRepository.getAreaCategories();
+        return this.areaRepository.getAreaCategories();
     }
 
     getAreaCategoryText(value: number | undefined): string | undefined {
@@ -63,15 +63,15 @@ export default class AreaService {
             return undefined;
         }
 
-        return this._areaRepository.getAreaCategoryText(value);
+        return this.areaRepository.getAreaCategoryText(value);
     }
 
     async getOrLoadAreasPage(page = 0, limit = 0): Promise<Array<Area> | false> {
         try {
-            const areasPage = await this._areasApi.areasGetPage(page, limit);
+            const areasPage = await this.areasAPI.areasGetPage(page, limit);
 
             if (page === 0) {
-                this._areaRepository.clearAreasDetailsMap();
+                this.areaRepository.clearAreasDetailsMap();
             }
 
             if (!areasPage.noItems) {
@@ -79,7 +79,7 @@ export default class AreaService {
             }
 
             for (const area of areasPage.items) {
-                this._areaRepository.setAreaDetails(area);
+                this.areaRepository.setAreaDetails(area);
             }
         } catch (err) {
             if (isNetworkError(err)) {
@@ -90,7 +90,7 @@ export default class AreaService {
             }
         }
 
-        const areas = this._areaRepository.getAreasPaginated(page, limit);
+        const areas = this.areaRepository.getAreasPaginated(page, limit);
         if (!areas) {
             return false;
         }
@@ -100,9 +100,9 @@ export default class AreaService {
 
     async getAreaDetails(id: string): Promise<Area | undefined> {
         try {
-            const area = await this._areasApi.areasGetArea(id);
+            const area = await this.areasAPI.areasGetArea(id);
 
-            this._areaRepository.setAreaDetails(area);
+            this.areaRepository.setAreaDetails(area);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_GET_DETAILS_ERROR, err);
@@ -110,15 +110,15 @@ export default class AreaService {
             }
         }
 
-        return this._areaRepository.getAreaDetails(id);
+        return this.areaRepository.getAreaDetails(id);
     }
 
     async addArea(data: AreaAddData): Promise<void> {
         let areaResponse;
 
         try {
-            areaResponse = await this._areasApi.areasPost(data);
-            this._areaRepository.setAreaDetails(areaResponse);
+            areaResponse = await this.areasAPI.areasPost(data);
+            this.areaRepository.setAreaDetails(areaResponse);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_ADD_ERROR, err);
@@ -127,13 +127,13 @@ export default class AreaService {
 
             areaResponse = {
                 id: new ObjectID().toHexString(),
-                owner: this._userRepository.getLoggedInUser(),
+                owner: this.userRepository.getLoggedInUser(),
                 ...data,
             } as Area;
-            this._areaRepository.addAreaOffline(areaResponse);
+            this.areaRepository.addAreaOffline(areaResponse);
         }
 
-        const area = this._areaRepository.getAreaDetails(areaResponse.id);
+        const area = this.areaRepository.getAreaDetails(areaResponse.id);
 
         this.emitter.emit(AreaServiceEvent.AREA_ADDED, area);
 
@@ -144,18 +144,18 @@ export default class AreaService {
 
     async updateArea(id: string, data: AreaUpdateData): Promise<void> {
         try {
-            const areaResponse = await this._areasApi.areasPatchArea(id, data);
-            this._areaRepository.setAreaDetails(areaResponse);
+            const areaResponse = await this.areasAPI.areasPatchArea(id, data);
+            this.areaRepository.setAreaDetails(areaResponse);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_UPDATE_ERROR, err);
                 return;
             }
 
-            this._areaRepository.updateAreaDetailsOffline(id, data);
+            this.areaRepository.updateAreaDetailsOffline(id, data);
         }
 
-        const area = this._areaRepository.getAreaDetails(id);
+        const area = this.areaRepository.getAreaDetails(id);
 
         this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
 
@@ -168,15 +168,15 @@ export default class AreaService {
         let offlineModifications = false;
 
         try {
-            await this._areasApi.areasDeleteArea(id);
-            this._areaRepository.deleteAreaDetails(id);
+            await this.areasAPI.areasDeleteArea(id);
+            this.areaRepository.deleteAreaDetails(id);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_DELETE_ERROR, err);
                 return;
             }
 
-            this._areaRepository.deleteAreaDetailsOffline(id);
+            this.areaRepository.deleteAreaDetailsOffline(id);
             offlineModifications = true;
         }
 
@@ -185,5 +185,9 @@ export default class AreaService {
         if (offlineModifications) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
+    }
+
+    async syncOfflineChanges() {
+        const areas = this.areaRepository.getOfflineChangedAreas();
     }
 }

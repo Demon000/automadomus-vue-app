@@ -15,12 +15,12 @@ export enum UserServiceEvent {
 
 export default class UserService {
     public emitter: EventEmitter;
-    private _userApi: UserAPI;
-    private _userRepository: UserRepository;
+    private userApi: UserAPI;
+    private userRepository: UserRepository;
 
     constructor(userApi: UserAPI, userRepository: UserRepository) {
-        this._userApi = userApi;
-        this._userRepository = userRepository;
+        this.userApi = userApi;
+        this.userRepository = userRepository;
         this.emitter = new EventEmitter();
     }
 
@@ -28,39 +28,39 @@ export default class UserService {
         let user;
 
         try {
-            user = await this._userApi.postUserLogin(data);
+            user = await this.userApi.postUserLogin(data);
         } catch (err) {
             this.emitter.emit(UserServiceEvent.USER_LOGIN_ERROR, err);
             return;
         }
 
-        this._userRepository.setLoggedInUser(user);
+        this.userRepository.setLoggedInUser(user);
         this.emitter.emit(UserServiceEvent.USER_LOGGED_IN, user);
     }
 
     async logoutUser(): Promise<void> {
         try {
-            await this._userApi.postUserLogout();
+            await this.userApi.postUserLogout();
         } catch (err) {
             this.emitter.emit(UserServiceEvent.USER_LOGOUT_ERROR, err);
             return;
         }
 
-        this._userRepository.setLoggedInUser(undefined);
+        this.userRepository.setLoggedInUser(undefined);
         this.emitter.emit(UserServiceEvent.USER_LOGGED_OUT);
     }
 
     async getLoggedInUser(): Promise<User | undefined> {
         try {
-            const user = await this._userApi.getUser();
-            this._userRepository.setLoggedInUser(user);
+            const user = await this.userApi.getUser();
+            this.userRepository.setLoggedInUser(user);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(UserServiceEvent.USER_GET_LOGGED_IN_ERROR, err);
-                this._userRepository.setLoggedInUser(undefined);
+                this.userRepository.setLoggedInUser(undefined);
             }
         }
 
-        return this._userRepository.getLoggedInUser();
+        return this.userRepository.getLoggedInUser();
     }
 }

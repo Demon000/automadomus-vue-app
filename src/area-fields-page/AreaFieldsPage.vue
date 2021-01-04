@@ -145,7 +145,7 @@ export default defineComponent({
 
             this.area = area;
             this.editedArea.name = area.name;
-            this.editedArea.category = '' + area.category;
+            this.editedArea.category = area.category;
             this.editedArea.location = area.location;
         },
         async onSaveUpdateButtonClick(): Promise<void> {
@@ -160,7 +160,7 @@ export default defineComponent({
             });
         },
         async onSaveAddButtonClick(): Promise<void> {
-            await areaService.addArea(this.area);
+            await areaService.addArea(this.editedArea);
         },
         async onSaveButtonClick(): Promise<void> {
             if (this.areaId) {
