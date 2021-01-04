@@ -17,11 +17,16 @@ export default class AreaRepository {
     }
 
     getAreasPaginated(page = 0, limit = 0, filterDeleted = true): Array<Area> {
-        return this.store.getters.areas
-            .filter((area: Area) => {
+        let areas = this.store.getters.areas;
+
+        if (filterDeleted) {
+            areas = areas.filter((area: Area) => {
                 const offlineFlags = area.offlineFlags || 0;
-                return !filterDeleted || !(offlineFlags & AreaOfflineFlags.DELETED);
-            })
+                return !(offlineFlags & AreaOfflineFlags.DELETED);
+            });
+        }
+
+        return areas
             .sort((first: Area, second: Area) => {
                 return -first.id.localeCompare(second.id);
             })
