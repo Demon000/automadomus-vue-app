@@ -15,18 +15,23 @@ import Area from '@/models/Area';
 import NetworkTrackingService, { NetworkTrackerEvent } from '@/services/NetworkTrackingService';
 import { AxiosError } from 'axios';
 import PingAPI from '@/api/PingAPI';
+import GeocodeAPI from '@/api/GeocodeAPI';
+import GeocodeService from '@/services/GeocodeService';
 
 const _api = new API(CONFIG_API_BASE_URL);
 
+const _geocodeApi = new GeocodeAPI(_api);
+const geocodeService = new GeocodeService(_geocodeApi);
+
 const _pingApi = new PingAPI(_api);
+const networkTrackingService = new NetworkTrackingService(_pingApi);
+
 const _userApi = new UserAPI(_api);
 const _userRepository = new UserRepository(_store);
 const userService = new UserService(_userApi, _userRepository);
 
 const _areasApi = new AreasAPI(_api);
 const _areaRepository = new AreaRepository(_store);
-
-const networkTrackingService = new NetworkTrackingService(_pingApi);
 const areaService = new AreaService(
     _areasApi,
     _areaRepository,
@@ -151,6 +156,7 @@ export {
     networkTrackingService,
     userService,
     areaService,
+    geocodeService,
     _store as store,
     _router as router,
     _StoreMutations as StoreMutations,
