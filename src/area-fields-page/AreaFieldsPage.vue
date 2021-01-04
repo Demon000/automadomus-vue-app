@@ -2,7 +2,7 @@
     <div class="page">
         <app-sidebar></app-sidebar>
         <app-navbar
-                has-back-button
+                has-nav-button
                 :title="title"
         >
             <template #toolbar>

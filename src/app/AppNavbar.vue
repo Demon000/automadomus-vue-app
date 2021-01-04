@@ -3,16 +3,18 @@
         <ui-top-app-bar
                 content-selector=""
                 class="ui-top-app-bar"
-                :nav-icon="hasBackButton"
+                :nav-icon="hasNavButton"
                 :type="1"
         >
             {{ title }}
-            <template #nav-icon v-if="hasBackButton">
-                <ui-icon-button
-                        @click="onBackButtonClick"
-                >
-                    <i class="mdi mdi-arrow-left"></i>
-                </ui-icon-button>
+            <template #nav-icon v-if="hasNavButton">
+                <slot name="nav-icon">
+                    <ui-icon-button
+                            @click="onBackButtonClick"
+                    >
+                        <i class="mdi mdi-arrow-left"></i>
+                    </ui-icon-button>
+                </slot>
             </template>
 
             <template #toolbar="{ toolbarItemClass }">
@@ -53,7 +55,7 @@ export default defineComponent({
     name: 'AppNavbar',
     props: {
         title: String,
-        hasBackButton: Boolean,
+        hasNavButton: Boolean,
         contentSelector: String,
     },
     data() {
