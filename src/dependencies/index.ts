@@ -63,11 +63,11 @@ async function redirectToIndex() {
     });
 }
 
-async function redirectToAreaDetails(area: Area) {
+async function redirectToAreaDetails(id: string) {
     await _router.replace({
         name: _RouteNames.AREA_DETAILS,
         params: {
-            areaId: area.id,
+            areaId: id,
         },
     });
 }
@@ -103,15 +103,22 @@ userService.emitter.on(UserServiceEvent.USER_LOGIN_ERROR, createErrorToast);
 userService.emitter.on(UserServiceEvent.USER_LOGOUT_ERROR, createErrorToast);
 
 areaService.emitter.on(AreaServiceEvent.AREA_UPDATED, async (area: Area) => {
-    if (area.id !== _router.currentRoute.value.params.areaId) {
+    const loadedAreaId = _router.currentRoute.value.params.areaId;
+    const routeName = _router.currentRoute.value.name;
+    if (routeName !== _RouteNames.AREA_EDIT || area.id !== loadedAreaId) {
         return;
     }
 
-    await redirectToAreaDetails(area);
+    await redirectToAreaDetails(area.id);
 });
 
 areaService.emitter.on(AreaServiceEvent.AREA_ADDED, async (area: Area) => {
-    await redirectToAreaDetails(area);
+    const routeName = _router.currentRoute.value.name;
+    if (routeName !== _RouteNames.AREA_ADD) {
+        return;
+    }
+
+    await redirectToAreaDetails(area.id);
 });
 
 areaService.emitter.on(
