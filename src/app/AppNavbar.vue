@@ -3,10 +3,11 @@
         <ui-top-app-bar
                 content-selector=""
                 class="ui-top-app-bar"
+                :nav-icon="hasBackButton"
                 :type="1"
         >
             {{ title }}
-            <template #nav-icon>
+            <template #nav-icon v-if="hasBackButton">
                 <ui-icon-button
                         @click="onBackButtonClick"
                 >
@@ -49,7 +50,6 @@ export default defineComponent({
     props: {
         title: String,
         hasBackButton: Boolean,
-        hasMenuButton: Boolean,
         contentSelector: String,
     },
     data() {
