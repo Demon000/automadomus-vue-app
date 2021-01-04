@@ -148,7 +148,7 @@ export default defineComponent({
 .search-field {
     box-sizing: border-box;
     width: 100%;
-    padding: 0 16px;
+    padding: 0 16px 4px;
 }
 
 .network-status {
