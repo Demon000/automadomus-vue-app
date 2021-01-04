@@ -1,45 +1,9 @@
 <template>
     <div class="app-sidebar">
-        <!--        <ion-menu side="start" menu-id="app-sidebar-menu" content-id="app-sidebar-content">-->
-        <!--            <ion-content id="app-sidebar-content">-->
-        <!--                <div class="sidebar-item">-->
-        <!--                    <div class="logo-container">-->
-        <!--                        <app-logo></app-logo>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--                <template v-if="user">-->
-        <!--                    <div-->
-        <!--                            class="sidebar-item"-->
-        <!--                            v-on:click="onHomeButtonClick"-->
-        <!--                    >-->
-        <!--                        <i class="icon mdi mdi-home"></i>-->
-        <!--                        <span>Home</span>-->
-        <!--                    </div>-->
-        <!--                    <div class="sidebar-item">-->
-        <!--                        <i class="icon mdi mdi-account"></i>-->
-        <!--                        <span>{{ user.firstName }} {{ user.lastName }}</span>-->
-        <!--                    </div>-->
-        <!--                    <div-->
-        <!--                            class="sidebar-item"-->
-        <!--                            v-on:click="onLogoutButtonClick"-->
-        <!--                    >-->
-        <!--                        <i class="icon mdi mdi-exit-to-app"></i>-->
-        <!--                        <span>-->
-        <!--                        Logout-->
-        <!--                    </span>-->
-        <!--                    </div>-->
-        <!--                </template>-->
-        <!--            </ion-content>-->
-        <!--        </ion-menu>-->
     </div>
 </template>
 
 <script lang="ts">
-// import {
-//     IonMenu,
-//     IonContent,
-//     IonIcon,
-// } from "@ionic/vue";
 import { defineComponent } from 'vue';
 
 import { RouteNames, userService } from '@/dependencies';
@@ -50,12 +14,6 @@ import User from '@/models/User';
 
 export default defineComponent({
     name: 'AppSidebar',
-    components: {
-        // IonMenu,
-        // IonContent,
-        // IonIcon,
-        AppLogo,
-    },
     data() {
         return {
             user: undefined as User | undefined,

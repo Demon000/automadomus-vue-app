@@ -1,6 +1,5 @@
 import { CONFIG_API_BASE_URL } from '@/config';
 
-// import {toastController} from '@ionic/vue';
 
 import _store, { _StoreMutations } from '@/dependencies/_store';
 import _router, { _RouteNames } from '@/dependencies/_router';

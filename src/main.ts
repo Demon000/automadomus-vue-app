@@ -1,15 +1,9 @@
-// import '@ionic/vue/css/core.css';
-// import '@ionic/vue/css/normalize.css';
-// import '@ionic/vue/css/structure.css';
-// import '@ionic/vue/css/typography.css';
-
 import '@mdi/font/css/materialdesignicons.css';
 import '@/app/index.css';
 import '@/app/index.scss';
 
 import { createApp, VNode } from 'vue';
 import BalmUI from 'balm-ui';
-// import {IonicVue} from '@ionic/vue';
 
 import { store, router } from '@/dependencies';
 
@@ -28,7 +22,6 @@ app.directive('observe-visibility', {
     unmounted: ObserveVisibility.unbind,
 });
 
-// app.use(IonicVue);
 app.use(BalmUI);
 app.use(store);
 app.use(router);
