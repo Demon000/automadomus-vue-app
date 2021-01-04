@@ -1,12 +1,17 @@
 <template>
     <div class="areas-page page">
         <app-sidebar></app-sidebar>
-        <app-navbar :has-menu-button="true" title="Areas">
-            <template v-slot:end>
-                <mdd-icon
-                        class="mdi mdi-plus"
+        <app-navbar
+                contentSelector=".areas-content"
+                title="Areas"
+                :has-menu-button="true"
+        >
+            <template #toolbar>
+                <ui-icon-button
                         @click="onAddButtonClick"
-                ></mdd-icon>
+                >
+                    <i class="mdi mdi-plus"></i>
+                </ui-icon-button>
             </template>
         </app-navbar>
         <div class="areas-content">
@@ -17,7 +22,7 @@
                 <area-item
                         class="area-item"
                         :area="item"
-                        v-on:click="onAreaItemClick(item.id)"
+                        @click="onAreaItemClick(item.id)"
                 ></area-item>
             </template>
 
@@ -41,8 +46,6 @@ import InfiniteScrollBottomDetector from '@/util-components/infinite-scroll/Infi
 import AppNavbar from '@/app/AppNavbar.vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AreaItem from '@/areas-page/AreaItem.vue';
-import MddFab from '@/mdd-components/MddFab.vue';
-import MddIcon from '@/mdd-components/MddIcon.vue';
 
 export default defineComponent({
     name: 'AreasPage',
@@ -51,8 +54,6 @@ export default defineComponent({
         AppNavbar,
         AreaItem,
         InfiniteScrollBottomDetector,
-        MddFab,
-        MddIcon,
     },
     data() {
         return {

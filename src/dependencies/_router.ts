@@ -2,8 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import AreasPage from '@/areas-page/AreasPage.vue';
 import LoginPage from '@/login-page/LoginPage.vue';
 import AreaDetailsPage from '@/area-details-page/AreaDetailsPage.vue';
-import AreaAddPage from '@/area-add-page/AreaAddPage.vue';
-import AreaUpdatePage from '@/area-update-page/AreaUpdatePage.vue';
+import AreaFieldsPage from '@/area-fields-page/AreaFieldsPage.vue';
 
 export enum _RouteNames {
     INDEX = 'index',
@@ -47,7 +46,7 @@ const _router = createRouter({
         {
             path: '/area-edit/:areaId',
             name: _RouteNames.AREA_EDIT,
-            component: AreaUpdatePage,
+            component: AreaFieldsPage,
             props: route => {
                 return {
                     areaId: route.params.areaId,
@@ -57,7 +56,7 @@ const _router = createRouter({
         {
             path: '/area-add',
             name: _RouteNames.AREA_ADD,
-            component: AreaAddPage,
+            component: AreaFieldsPage,
         },
     ],
 });

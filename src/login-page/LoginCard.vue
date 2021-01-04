@@ -1,41 +1,41 @@
 <template>
     <div class="login-card">
-        <mdd-input
-                :outline="true"
-                label="Username"
+        <ui-textfield
+                class="ui-textfield"
+                fullwidth
+                outlined
                 v-model="username"
                 @keyup.enter="onLoginButtonClick"
-        ></mdd-input>
+        >
+            Username
+        </ui-textfield>
 
-        <mdd-input
-                :outline="true"
-                label="Password"
-                type="password"
+        <ui-textfield
+                class="ui-textfield"
+                fullwidth
+                outlined
                 v-model="password"
+                input-type="password"
                 @keyup.enter="onLoginButtonClick"
-        ></mdd-input>
+        >
+            Password
+        </ui-textfield>
 
-        <mdd-fab
-                title="LOGIN"
+        <ui-fab
+                extended
                 @click="onLoginButtonClick"
         >
-        </mdd-fab>
+            <span>Login</span>
+        </ui-fab>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-import MddInput from '@/mdd-components/MddInput.vue';
-import MddFab from '@/mdd-components/MddFab.vue';
 import { userService } from '@/dependencies';
 
 export default defineComponent({
     name: 'LoginCard',
-    components: {
-        MddInput,
-        MddFab,
-    },
     data() {
         return {
             username: '',
@@ -56,5 +56,9 @@ export default defineComponent({
 <style scoped>
 .login-card {
     text-align: center;
+}
+
+.ui-textfield {
+    margin-bottom: 16px;
 }
 </style>

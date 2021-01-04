@@ -5,8 +5,10 @@
 
 import '@mdi/font/css/materialdesignicons.css';
 import '@/app/index.css';
+import '@/app/index.scss';
 
 import { createApp, VNode } from 'vue';
+import BalmUI from 'balm-ui';
 // import {IonicVue} from '@ionic/vue';
 
 import { store, router } from '@/dependencies';
@@ -27,6 +29,7 @@ app.directive('observe-visibility', {
 });
 
 // app.use(IonicVue);
+app.use(BalmUI);
 app.use(store);
 app.use(router);
 app.mount('#app');

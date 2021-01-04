@@ -1,5 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');
 
 module.exports = {
     pages: {
@@ -17,4 +19,15 @@ module.exports = {
     chainWebpack: config => {
         config.resolve.symlinks(false);
     },
+    // css: {
+    //     loaderOptions: {
+    //         sass: {
+    //             sassOptions: {
+    //                 includePaths: [
+    //                     path.resolve(__dirname, 'node_modules'),
+    //                 ],
+    //             },
+    //         },
+    //     },
+    // },
 };

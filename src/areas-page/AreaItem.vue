@@ -1,11 +1,31 @@
 <template>
     <div class="area-item">
         <template v-if="area">
-            <mdd-card
-                    :header="area.name"
-                    :subheader="areaCategoryText"
+            <ui-card
+                    class="area-add-card"
+                    outlined
             >
-            </mdd-card>
+                <ui-card-content
+                        class="area-add-card__content"
+                >
+                    <div
+                            :class="[
+                                $tt('headline5'),
+                                'area-card__name'
+                            ]"
+                    >
+                        {{ area.name }}
+                    </div>
+                    <div
+                            :class="[
+                                $tt('subtitle1'),
+                                'area-card__category_text'
+                            ]"
+                    >
+                        {{ areaCategoryText }}
+                    </div>
+                </ui-card-content>
+            </ui-card>
         </template>
     </div>
 </template>
@@ -14,17 +34,8 @@
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
 
-import MddCard from '@/mdd-components/MddCard.vue';
-
 export default defineComponent({
     name: 'AreaItem',
-    components: {
-        MddCard,
-    // IonCard,
-    // IonCardHeader,
-    // IonCardTitle,
-    // IonCardSubtitle,
-    },
     props: {
         area: {
             type: Object,
@@ -46,5 +57,13 @@ export default defineComponent({
 <style scoped>
 .area-item {
     cursor: pointer;
+}
+
+.area-add-card {
+    margin: 16px;
+}
+
+.area-add-card__content {
+    padding: 16px;
 }
 </style>

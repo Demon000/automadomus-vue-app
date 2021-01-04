@@ -30,4 +30,8 @@ export default interface Area {
 
 export type IAreaPage = Page<Area>;
 export type AreaCategoriesMap = { [key: number]: string };
+export type AreaCategorySelectOption = {
+    value: number,
+    label: string,
+};
 export type AreasDetailsMap = { [key: string]: Area };

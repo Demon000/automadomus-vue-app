@@ -1,22 +1,29 @@
 <template>
-    <div class="app-navbar mdd-elevation-2">
-        <div class="top">
-            <div class="start">
-                <mdd-icon
-                        name="mdi mdi-arrow-left"
-                        v-if="hasBackButton"
+    <div class="app-navbar">
+        <ui-top-app-bar
+                content-selector=""
+                class="ui-top-app-bar"
+                :type="1"
+        >
+            {{ title }}
+            <template #nav-icon>
+                <ui-icon-button
                         @click="onBackButtonClick"
                 >
-                </mdd-icon>
-                <slot name="start"></slot>
-            </div>
-            <div class="middle">
-                <div class="title"> {{ title }} </div>
-            </div>
-            <div class="end">
-                <slot name="end"></slot>
-            </div>
-        </div>
+                    <i class="mdi mdi-arrow-left"></i>
+                </ui-icon-button>
+            </template>
+
+            <template #toolbar="{ toolbarItemClass }">
+                <slot
+                        name="toolbar"
+                        v-bind="{
+                            toolbarItemClass,
+                        }"
+                >
+                </slot>
+            </template>
+        </ui-top-app-bar>
         <div class="sub">
             <template v-if="!networkStatus">
                 <span
@@ -34,18 +41,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import MddIcon from '@/mdd-components/MddIcon.vue';
 import { networkTrackingService } from '@/dependencies';
 
 export default defineComponent({
     name: 'AppNavbar',
-    components: {
-        MddIcon,
-    },
     props: {
         title: String,
         hasBackButton: Boolean,
         hasMenuButton: Boolean,
+        contentSelector: String,
     },
     data() {
         return {
@@ -75,71 +79,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import '../mdd-components/mdd-elevation-shadow.css';
-
-.app-navbar {
-    --bg: var(--navbar-bg-color, #000000);
-    --fg: var(--navbar-fg-color, #ffffff);
-    --horizontal-padding: var(--navbar-horizontal-padding, 16px);
-    --line-height: var(--navbar-line-height, 36px);
-    --vertical-padding: var(--navbar-vertical-padding, 10px);
-
-    box-sizing: border-box;
-    height: var(--height);
-    line-height: var(--line-height);
-    padding: var(--vertical-padding) var(--horizontal-padding);
-
-    color: var(--fg);
-    background: var(--bg);
-}
-
-.top,
-.start,
-.end,
-.sub {
-    display: flex;
-}
-
-.end {
-    margin-left: auto;
-}
-
-.title {
-    font-size: 20px;
-}
-
-.app-navbar::v-deep(.mdd-icon) {
-    padding: 6px;
-    margin-left: -6px;
-    margin-right: 6px;
-
-    line-height: 24px;
-    border-radius: 50%;
-    cursor: pointer;
-
-    transition: 0.125s background ease-out;
-}
-
-.app-navbar::v-deep(.mdd-icon:hover) {
-    background: var(--navbar-action-button-hover-bg);
-}
-
-.app-navbar::v-deep(.mdd-icon:active) {
-    background: var(--navbar-action-button-active-bg);
-}
-
-.sub {
-    font-size: 14px;
-    line-height: 16px;
-
-    color: var(--navbar-network-tracker-fg-color);
-
-    display: flex;
-    justify-content: center;
-}
-
-.offline-text {
-    cursor: pointer;
-    user-select: none;
+.ui-top-app-bar {
+    position: initial;
 }
 </style>

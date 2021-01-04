@@ -1,28 +1,29 @@
 <template>
     <div class="area-details-page">
         <app-sidebar></app-sidebar>
-        <app-navbar :has-back-button="true" :title="area ? area.name : ''">
-            <template v-slot:end>
-                <mdd-icon
-                        name="mdi mdi-pencil"
+        <app-navbar
+                :has-back-button="true"
+                :title="area ? area.name : ''">
+            <template #toolbar>
+                <ui-icon-button
                         @click="onEditButtonClick"
                 >
-                </mdd-icon>
-
-                <mdd-icon
-                        name="mdi mdi-delete"
+                    <i class="mdi mdi-pencil"></i>
+                </ui-icon-button>
+                <ui-icon-button
                         @click="onDeleteButtonClick"
                 >
-                </mdd-icon>
+                    <i class="mdi mdi-delete"></i>
+                </ui-icon-button>
             </template>
         </app-navbar>
-        <mdd-card>
-            <template
+        <ui-card
+                class="area-details-card"
+                outlined
+        >
+            <div class="area-details-card__content">
+                <template
                     v-if="area"
-                    v-slot:content
-            >
-                <div
-                        class="area-details-content"
                 >
                     <div
                             class="property"
@@ -47,9 +48,9 @@
                         <div class="type">Number of controllers</div>
                         <div class="value">{{ area.noControllers }}</div>
                     </div>
-                </div>
-            </template>
-        </mdd-card>
+                </template>
+            </div>
+        </ui-card>
     </div>
 </template>
 
@@ -57,24 +58,14 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-// import {IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle} from '@ionic/vue';
 import { areaService, RouteNames } from '@/dependencies';
 import Area from '@/models/Area';
-import MddCard from '@/mdd-components/MddCard.vue';
-import MddIcon from '@/mdd-components/MddIcon.vue';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
     components: {
         AppSidebar,
         AppNavbar,
-        MddCard,
-        MddIcon,
-    // IonCard,
-    // IonCardHeader,
-    // IonCardTitle,
-    // IonCardSubtitle,
-    // IonCardContent,
     },
     props: {
         areaId: {
@@ -139,7 +130,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.area-details-content {
+.area-details-card {
+    margin: 16px;
+}
+
+.area-details-card__content {
     padding: 16px;
 }
 
