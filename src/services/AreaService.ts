@@ -25,6 +25,7 @@ export enum AreaServiceEvent {
     AREA_DELETED = 'area-deleted',
     AREA_DELETE_ERROR = 'area-delete-error',
     OFFLINE_MODIFICATIONS = 'offline-modifications',
+    SYNC_DONE = 'sync-done',
 }
 
 export default class AreaService {
@@ -224,32 +225,38 @@ export default class AreaService {
         return true;
     }
 
+    async syncAreaOfflineChanges(area: Area): Promise<void> {
+        const isDeleted = this.hasAreaOfflineFlag(area, AreaOfflineFlags.DELETED);
+        const isAdded = this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
+        const isUpdated = this.hasAreaOfflineFlag(area, AreaOfflineFlags.UPDATED);
+        let success = false;
+
+        if (isDeleted) {
+            success = await this.deleteArea(area.id, false, true);
+        } else if (isAdded) {
+            success = await this.addArea(area, false, false);
+        } else if (isUpdated) {
+            success = await this.updateArea(area.id, area, false, false);
+        }
+
+        if (!success) {
+            return;
+        }
+
+        if (isUpdated) {
+            this.areaRepository.clearAreaDetailsOfflineFlags(area.id);
+        } else if (isAdded) {
+            await this.deleteArea(area.id);
+        }
+    }
+
     async syncOfflineChanges(): Promise<void> {
         const areas = this.areaRepository.getOfflineChangedAreas();
 
         for (const area of areas) {
-            const isDeleted = this.hasAreaOfflineFlag(area, AreaOfflineFlags.DELETED);
-            const isAdded = this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
-            const isUpdated = this.hasAreaOfflineFlag(area, AreaOfflineFlags.UPDATED);
-            let success = false;
-
-            if (isDeleted) {
-                success = await this.deleteArea(area.id, false, true);
-            } else if (isAdded) {
-                success = await this.addArea(area, false, false);
-            } else if (isUpdated) {
-                success = await this.updateArea(area.id, area, false, false);
-            }
-
-            if (!success) {
-                continue;
-            }
-
-            if (isUpdated) {
-                this.areaRepository.clearAreaDetailsOfflineFlags(area.id);
-            } else if (isAdded) {
-                await this.deleteArea(area.id);
-            }
+            await this.syncAreaOfflineChanges(area);
         }
+
+        this.emitter.emit(AreaServiceEvent.SYNC_DONE);
     }
 }

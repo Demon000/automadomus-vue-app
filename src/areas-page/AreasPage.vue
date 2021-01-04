@@ -46,6 +46,7 @@ import InfiniteScrollBottomDetector from '@/util-components/infinite-scroll/Infi
 import AppNavbar from '@/app/AppNavbar.vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AreaItem from '@/areas-page/AreaItem.vue';
+import { AreaServiceEvent } from '@/services/AreaService';
 
 export default defineComponent({
     name: 'AreasPage',
@@ -64,8 +65,12 @@ export default defineComponent({
         };
     },
     mounted() {
-        this.resetLoadedPages();
-        this.loadNextPageUntilNotScrolledToBottom();
+        this.reloadPages();
+
+        areaService.emitter.on(AreaServiceEvent.SYNC_DONE, this.onSyncDone);
+    },
+    beforeUnmount() {
+        areaService.emitter.off(AreaServiceEvent.SYNC_DONE, this.onSyncDone);
     },
     methods: {
         async loadItemsPage(page = 0): Promise<boolean> {
@@ -81,10 +86,6 @@ export default defineComponent({
             this.items = this.items.concat(items);
 
             return true;
-        },
-        async resetLoadedPages() {
-            this.page = -1;
-            this.items = [];
         },
         async loadNextPage(): Promise<boolean> {
             const hasLoadedAnything = await this.loadItemsPage(this.page + 1);
@@ -108,6 +109,12 @@ export default defineComponent({
 
             setTimeout(this.loadNextPageUntilNotScrolledToBottom, 0);
         },
+        async reloadPages() {
+            this.page = -1;
+            this.items = [];
+
+            await this.loadNextPageUntilNotScrolledToBottom();
+        },
         onScrolledToBottom(status: boolean) {
             this.scrolledToBottom = status;
             if (!status) {
@@ -115,6 +122,9 @@ export default defineComponent({
             }
 
             this.loadNextPageUntilNotScrolledToBottom();
+        },
+        async onSyncDone() {
+            await this.reloadPages();
         },
         async onAreaItemClick(areaId: string) {
             await this.$router.push({
