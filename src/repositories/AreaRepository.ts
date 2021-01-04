@@ -39,7 +39,7 @@ export default class AreaRepository {
         this.store.commit(StoreMutations.CLEAR_AREAS_DETAILS_MAP);
     }
 
-    getAreaDetails(id: string): Area {
+    getAreaDetails(id: string): Area | undefined {
         return this.store.getters.getAreaDetails(id);
     }
 
@@ -74,10 +74,26 @@ export default class AreaRepository {
 
     deleteAreaDetailsOffline(id: string): void {
         const area = this.getAreaDetails(id);
+        if (!area) {
+            console.error(`Trying to delete non-existent area with id: ${id}?`);
+            return;
+        }
+
         if (!area.offlineFlags) {
             area.offlineFlags = 0;
         }
         area.offlineFlags |= AreaOfflineFlags.DELETED;
+        this.setAreaDetails(area);
+    }
+
+    clearAreaDetailsOfflineFlags(id: string): void {
+        const area = this.getAreaDetails(id);
+        if (!area) {
+            console.error(`Trying to clear offline flags for non-existent area with id: ${id}?`);
+            return;
+        }
+
+        area.offlineFlags = 0;
         this.setAreaDetails(area);
     }
 

@@ -10,7 +10,7 @@ import Area, {
 } from '@/models/Area';
 
 import AreasAPI from '@/api/AreasAPI';
-import AreaRepository from '@/repositories/AreaRepository';
+import AreaRepository, { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import UserRepository from '@/repositories/UserRepository';
 
 export enum AreaServiceEvent {
@@ -113,7 +113,7 @@ export default class AreaService {
         return this.areaRepository.getAreaDetails(id);
     }
 
-    async addArea(data: AreaAddData): Promise<void> {
+    async addArea(data: AreaAddData, fromSync = false): Promise<boolean> {
         let areaResponse;
 
         try {
@@ -122,7 +122,11 @@ export default class AreaService {
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_ADD_ERROR, err);
-                return;
+                return false;
+            }
+
+            if (fromSync) {
+                return false;
             }
 
             areaResponse = {
@@ -135,21 +139,29 @@ export default class AreaService {
 
         const area = this.areaRepository.getAreaDetails(areaResponse.id);
 
-        this.emitter.emit(AreaServiceEvent.AREA_ADDED, area);
+        if (!fromSync) {
+            this.emitter.emit(AreaServiceEvent.AREA_ADDED, area);
+        }
 
-        if (area.offlineFlags) {
+        if (!fromSync && area && area.offlineFlags) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
+
+        return true;
     }
 
-    async updateArea(id: string, data: AreaUpdateData): Promise<void> {
+    async updateArea(id: string, data: AreaUpdateData, fromSync = false): Promise<boolean> {
         try {
             const areaResponse = await this.areasAPI.areasPatchArea(id, data);
             this.areaRepository.setAreaDetails(areaResponse);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_UPDATE_ERROR, err);
-                return;
+                return false;
+            }
+
+            if (fromSync) {
+                return false;
             }
 
             this.areaRepository.updateAreaDetailsOffline(id, data);
@@ -157,37 +169,86 @@ export default class AreaService {
 
         const area = this.areaRepository.getAreaDetails(id);
 
-        this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
+        if (!fromSync) {
+            this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
+        }
 
-        if (area.offlineFlags) {
+        if (!fromSync && area && area.offlineFlags) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
+
+        return true;
     }
 
-    async deleteArea(id: string): Promise<void> {
+    hasAreaOfflineFlag(area: Area, flag: number): boolean {
+        return area.offlineFlags !== undefined && !!(area.offlineFlags & flag);
+    }
+
+    canDeleteLocallyOnly(id: string): boolean {
+        const area = this.areaRepository.getAreaDetails(id);
+        return !!area && this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
+    }
+
+    async deleteArea(id: string, fromSync = false): Promise<boolean> {
         let offlineModifications = false;
 
         try {
-            await this.areasAPI.areasDeleteArea(id);
+            if (!this.canDeleteLocallyOnly(id)) {
+                await this.areasAPI.areasDeleteArea(id);
+            }
+
             this.areaRepository.deleteAreaDetails(id);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_DELETE_ERROR, err);
-                return;
+                return false;
+            }
+
+            if (fromSync) {
+                return false;
             }
 
             this.areaRepository.deleteAreaDetailsOffline(id);
             offlineModifications = true;
         }
 
-        this.emitter.emit(AreaServiceEvent.AREA_DELETED, id);
+        if (!fromSync) {
+            this.emitter.emit(AreaServiceEvent.AREA_DELETED, id);
+        }
 
-        if (offlineModifications) {
+        if (!fromSync && offlineModifications) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
+
+        return true;
     }
 
-    async syncOfflineChanges() {
+    async syncOfflineChanges(): Promise<void> {
         const areas = this.areaRepository.getOfflineChangedAreas();
+
+        for (const area of areas) {
+            const isDeleted = this.hasAreaOfflineFlag(area, AreaOfflineFlags.DELETED);
+            const isAdded = this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
+            const isUpdated = this.hasAreaOfflineFlag(area, AreaOfflineFlags.UPDATED);
+            let success = false;
+
+            if (isDeleted) {
+                success = await this.deleteArea(area.id, true);
+            } else if (isAdded) {
+                success = await this.addArea(area, true);
+            } else if (isUpdated) {
+                success = await this.updateArea(area.id, area, true);
+            }
+
+            if (!success) {
+                continue;
+            }
+
+            if (isDeleted || isUpdated) {
+                this.areaRepository.clearAreaDetailsOfflineFlags(area.id);
+            } else if (isAdded) {
+                await this.deleteArea(area.id);
+            }
+        }
     }
 }

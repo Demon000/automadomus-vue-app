@@ -117,7 +117,7 @@ export default defineComponent({
             this.reloadArea();
         },
     },
-    async mounted() {
+    mounted() {
         this.loadCategories();
 
         if (this.areaId) {
