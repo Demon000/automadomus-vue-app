@@ -11,30 +11,7 @@ module.exports = {
             filename: 'index.html',
         },
     },
-    // configureWebpack: {
-    //     resolve: {
-    //         alias: {
-    //             vue: 'vue/dist/vue.esm-bundler.js',
-    //         },
-    //     },
-    // },
-    devServer: {
-        https: true,
-        cert: fs.readFileSync('../odomu-certs/cert.pem'),
-        key: fs.readFileSync('../odomu-certs/key.pem'),
-    },
     chainWebpack: config => {
         config.optimization.delete('splitChunks');
     },
-    // css: {
-    //     loaderOptions: {
-    //         sass: {
-    //             sassOptions: {
-    //                 includePaths: [
-    //                     path.resolve(__dirname, 'node_modules'),
-    //                 ],
-    //             },
-    //         },
-    //     },
-    // },
 };
