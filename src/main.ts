@@ -9,6 +9,8 @@ import { store, router } from '@/dependencies';
 
 import { ObserveVisibility } from 'vue-observe-visibility';
 
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
 import App from '@/app/App.vue';
 
 const app = createApp(App);
@@ -26,3 +28,5 @@ app.use(BalmUI);
 app.use(store);
 app.use(router);
 app.mount('#app');
+
+defineCustomElements(window);

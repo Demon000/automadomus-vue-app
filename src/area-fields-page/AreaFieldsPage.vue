@@ -16,64 +16,85 @@
                 </ui-icon-button>
             </template>
         </app-navbar>
-        <ui-card
-                class="card"
-                outlined
-        >
-            <div class="content">
-                <ui-textfield
-                        class="ui-textfield"
-                        fullwidth
-                        outlined
-                        v-model="editedArea.name"
-                >
-                    Name
-                </ui-textfield>
-
-                <ui-select
-                        class="ui-textfield"
-                        fullwidth
-                        outlined
-                        :options="categoriesSelectOptions"
-                        v-model="editedArea.category"
-                >
-                    Category
-                </ui-select>
-
-                <ui-textfield
-                        class="ui-textfield"
-                        fullwidth
-                        outlined
-                        v-model="editedArea.location"
-                >
-                    Location
-                    <template #after>
-                        <ui-textfield-icon>
-                            <ui-icon-button
-                                @click="onOpenMapButtonClick"
-                            >
-                                <i class="mdi mdi-map-marker"></i>
-                            </ui-icon-button>
-                        </ui-textfield-icon>
-                    </template>
-                </ui-textfield>
-
-                <div class="point-fields" v-if="editedArea.locationPoint">
+        <div class="page-content">
+            <ui-card
+                    class="card"
+                    outlined
+            >
+                <div class="content">
                     <ui-textfield
                             class="ui-textfield"
-                            v-model="editedArea.locationPoint[0]"
+                            fullwidth
+                            outlined
+                            v-model="editedArea.name"
                     >
-                        Latitude
+                        Name
                     </ui-textfield>
+
+                    <ui-select
+                            class="ui-textfield"
+                            fullwidth
+                            outlined
+                            :options="categoriesSelectOptions"
+                            v-model="editedArea.category"
+                    >
+                        Category
+                    </ui-select>
+
                     <ui-textfield
                             class="ui-textfield"
-                            v-model="editedArea.locationPoint[1]"
+                            fullwidth
+                            outlined
+                            v-model="editedArea.location"
                     >
-                        Longitude
+                        Location
+                        <template #after>
+                            <ui-textfield-icon>
+                                <ui-icon-button
+                                        @click="onOpenMapButtonClick"
+                                >
+                                    <i class="mdi mdi-map-marker"></i>
+                                </ui-icon-button>
+                            </ui-textfield-icon>
+                        </template>
+                    </ui-textfield>
+
+                    <div class="point-fields" v-if="editedArea.locationPoint">
+                        <ui-textfield
+                                class="ui-textfield"
+                                v-model="editedArea.locationPoint[0]"
+                        >
+                            Latitude
+                        </ui-textfield>
+                        <ui-textfield
+                                class="ui-textfield"
+                                v-model="editedArea.locationPoint[1]"
+                        >
+                            Longitude
+                        </ui-textfield>
+                    </div>
+
+                    <ui-textfield
+                            class="ui-textfield"
+                            fullwidth
+                            outlined
+                            v-model="imageName"
+                            @keydown.capture.prevent.stop
+                    >
+                        Image
+                        <template #after>
+                            <ui-textfield-icon>
+                                <ui-icon-button
+                                        @click="onOpenCameraButtonClick"
+                                >
+                                    <i class="mdi mdi-camera"></i>
+                                </ui-icon-button>
+                            </ui-textfield-icon>
+                        </template>
                     </ui-textfield>
                 </div>
-            </div>
-        </ui-card>
+            </ui-card>
+        </div>
     </div>
     <area-location-select-page
             v-else-if="mode === PageMode.LOCATION"
@@ -91,6 +112,9 @@ import { areaService } from '@/dependencies';
 import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption, AreaUpdateData } from '@/models/Area';
 import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
 import Location, { LocationPoint } from '@/models/Location';
+
+import { Plugins, CameraResultType } from '@capacitor/core';
+const { Camera } = Plugins;
 
 enum PageMode {
     FIELDS = 'fields',
@@ -122,7 +146,9 @@ export default defineComponent({
                 category: 0,
                 location: '',
                 locationPoint: [0, 0],
+                image: '',
             } as AreaAddData,
+            imageName: '',
             PageMode,
             mode: PageMode.FIELDS,
             categories: {} as AreaCategoriesMap,
@@ -156,7 +182,11 @@ export default defineComponent({
 
             return categoriesSelectOptions;
         },
-        initialLocationPoint(): LocationPoint {
+        initialLocationPoint(): LocationPoint | undefined {
+            if (this.isAddMode) {
+                return undefined;
+            }
+
             return {
                 lat: this.editedArea.locationPoint[0],
                 lng: this.editedArea.locationPoint[1],
@@ -223,6 +253,10 @@ export default defineComponent({
                 areaUpdateData.locationPoint = this.editedArea.locationPoint;
             }
 
+            if (this.area.image !== this.editedArea.image) {
+                areaUpdateData.image = this.editedArea.image;
+            }
+
             await areaService.updateArea(this.areaId, areaUpdateData);
         },
         async onSaveAddButtonClick(): Promise<void> {
@@ -245,6 +279,26 @@ export default defineComponent({
         },
         async onOpenMapButtonClick(): Promise<void> {
             this.mode = PageMode.LOCATION;
+        },
+        async onOpenCameraButtonClick() {
+            const image = await Camera.getPhoto({
+                quality: 90,
+                allowEditing: true,
+                resultType: CameraResultType.Base64,
+            });
+
+            const date = new Date(Date.now());
+
+            this.imageName = [
+                'image',
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                date.getHours(),
+                date.getMinutes(),
+                date.getSeconds(),
+            ].join('-') + '.png';
+            this.editedArea.image = image.base64String;
         },
     },
 });

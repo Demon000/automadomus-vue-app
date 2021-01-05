@@ -34,6 +34,7 @@ export default class AreasAPI {
             category: data.category,
             location: data.location,
             locationPoint: data.locationPoint,
+            image: data.image,
         });
         return response.data as Area;
     }
@@ -49,6 +50,7 @@ export default class AreasAPI {
             category: data.category,
             location: data.location,
             locationPoint: data.locationPoint,
+            image: data.image,
         });
         return response.data as Area;
     }

@@ -42,7 +42,7 @@
                 </div>
             </template>
         </app-navbar>
-        <div class="content">
+        <div class="page-content">
             <template
                     v-for="item in items"
                     :key="item.id"
@@ -182,11 +182,6 @@ export default defineComponent({
 
 .area-item {
     cursor: pointer;
-}
-
-.content {
-    overflow: auto;
-    height: 100%;
 }
 
 .search-field {

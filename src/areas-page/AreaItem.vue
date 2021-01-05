@@ -8,32 +8,42 @@
                 <ui-card-content
                         class="content"
                 >
-                    <div
-                            class="name"
-                            :class="$tt('headline5')"
-                    >
-                        {{ area.name }}
-                    </div>
-                    <div
-                            class="category_text"
-                            :class="$tt('subtitle1')"
-                    >
-                        {{ areaCategoryText }}
-                    </div>
-                    <div
-                            class="offline-marker"
-                            v-if="
+                    <ui-card-media
+                            class="media"
+                            v-if="area.hasImage"
+                            square
+                            :style="{
+                                backgroundImage: `url('${areaImageUrl}')`,
+                            }"
+                    ></ui-card-media>
+                    <div class="text">
+                        <div
+                                class="name"
+                                :class="$tt('headline5')"
+                        >
+                            {{ area.name }}
+                        </div>
+                        <div
+                                class="category_text"
+                                :class="$tt('subtitle1')"
+                        >
+                            {{ areaCategoryText }}
+                        </div>
+                        <div
+                                class="offline-marker"
+                                v-if="
                                 hasOfflineFlag(AreaOfflineFlags.ADDED
                                 | AreaOfflineFlags.UPDATED
                                 | AreaOfflineFlags.DELETED)
                             "
-                            :class="{
+                                :class="{
                                 'deleted': hasOfflineFlag(AreaOfflineFlags.DELETED),
                             }"
-                    >
-                        <ui-icon-button>
-                            <i class="mdi mdi-sync-alert"></i>
-                        </ui-icon-button>
+                        >
+                            <ui-icon-button>
+                                <i class="mdi mdi-sync-alert"></i>
+                            </ui-icon-button>
+                        </div>
                     </div>
                 </ui-card-content>
             </ui-card>
@@ -46,6 +56,7 @@ import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
 import { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import Area from '@/models/Area';
+import { CONFIG_API_BASE_URL } from '@/config';
 
 export default defineComponent({
     name: 'AreaItem',
@@ -68,6 +79,9 @@ export default defineComponent({
 
             return areaService.getAreaCategoryText(this.area.category);
         },
+        areaImageUrl(): string {
+            return `${CONFIG_API_BASE_URL}/areas/${this.area.id}/image`;
+        },
     },
     methods: {
         hasOfflineFlag(flag: number): boolean {
@@ -87,6 +101,16 @@ export default defineComponent({
 }
 
 .content {
+    display: flex;
+    flex-direction: row;
+}
+
+.media {
+    width: 120px;
+    height: 100%;
+}
+
+.text {
     padding: 16px;
 }
 

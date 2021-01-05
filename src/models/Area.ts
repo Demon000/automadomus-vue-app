@@ -6,6 +6,7 @@ export interface AreaAddData {
     category: number | string;
     location: string;
     locationPoint: [number, number];
+    image?: string;
 }
 
 export type AreaUpdateData = Partial<AreaAddData> & {
@@ -20,6 +21,7 @@ export default interface Area {
     location: string;
     locationPoint: [number, number];
 
+    image?: string;
     hasImage?: boolean;
     noDevices?: number;
     noControllers?: number;
