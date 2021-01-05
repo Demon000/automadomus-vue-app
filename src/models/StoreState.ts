@@ -5,4 +5,6 @@ export default interface StoreState {
     loggedInUser: User | undefined;
     areasDetailsMap: AreasDetailsMap;
     areaCategories: AreaCategoriesMap;
+    accessToken: string | undefined;
+    refreshToken: string | undefined;
 }

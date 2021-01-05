@@ -11,6 +11,8 @@ export enum _StoreMutations {
     CLEAR_AREAS_DETAILS_MAP = 'clearAreasDetailsMap',
     DELETE_AREA_DETAILS = 'deleteAreaDetails',
     SET_AREA_CATEGORIES = 'setAreaCategories',
+    SET_ACCESS_TOKEN = 'setAccessToken',
+    SET_REFRESH_TOKEN = 'setRefreshToken',
 }
 
 export default createStore({
@@ -19,6 +21,8 @@ export default createStore({
         loggedInUser: undefined,
         areaCategories: {},
         areasDetailsMap: {},
+        accessToken: undefined,
+        refreshToken: undefined,
     } as StoreState,
     mutations: {
         [_StoreMutations.SET_LOGGED_IN_USER](
@@ -26,6 +30,18 @@ export default createStore({
             user: User | undefined,
         ) {
             state.loggedInUser = user;
+        },
+        [_StoreMutations.SET_ACCESS_TOKEN](
+            state: StoreState,
+            token: string,
+        ) {
+            state.accessToken = token;
+        },
+        [_StoreMutations.SET_REFRESH_TOKEN](
+            state: StoreState,
+            token: string,
+        ) {
+            state.refreshToken = token;
         },
         [_StoreMutations.SET_AREA_DETAILS](state: StoreState, area: Area) {
             if (!(area.id in state.areasDetailsMap)) {
@@ -51,6 +67,12 @@ export default createStore({
     getters: {
         loggedInUser(state: StoreState): User | undefined {
             return state.loggedInUser;
+        },
+        accessToken(state: StoreState): string | undefined {
+            return state.accessToken;
+        },
+        refreshToken(state: StoreState): string | undefined {
+            return state.refreshToken;
         },
         areas(state: StoreState): Area[] {
             return Object.values(state.areasDetailsMap);

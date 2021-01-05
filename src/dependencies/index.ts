@@ -18,7 +18,7 @@ import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
 
-const _api = new API(CONFIG_API_BASE_URL);
+const _api = new API(CONFIG_API_BASE_URL, _store.getters.accessToken, _store.getters.refreshToken);
 
 const _geocodeApi = new GeocodeAPI(_api);
 const geocodeService = new GeocodeService(_geocodeApi);
@@ -76,6 +76,18 @@ _api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
     } catch (err) {
         console.error(err);
     }
+});
+
+_api.emitter.on(APIEvents.ACCESS_TOKEN_UPDATED, async (token: string) => {
+    console.log('access');
+    _store.commit(_StoreMutations.SET_ACCESS_TOKEN, token);
+    _api.setAccessToken(token);
+});
+
+_api.emitter.on(APIEvents.REFRESH_TOKEN_UPDATED, async (token: string) => {
+    console.log('refresh');
+    _store.commit(_StoreMutations.SET_REFRESH_TOKEN, token);
+    _api.setRefreshToken(token);
 });
 
 networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () => {
