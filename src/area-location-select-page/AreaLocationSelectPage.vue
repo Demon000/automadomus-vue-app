@@ -228,8 +228,8 @@ export default defineComponent({
     z-index: 1000;
 }
 
-.details-card {
-    padding: 16px;
+.ui-textfield {
+    margin: 16px 16px 16px;
 }
 
 .point-fields {
@@ -238,13 +238,6 @@ export default defineComponent({
 
 .point-fields .ui-textfield {
     flex-grow: 1;
-}
-
-.point-fields .ui-textfield:not(:last-child) {
-    margin-right: 16px;
-}
-
-.ui-textfield:not(:last-child) {
-    margin-bottom: 16px;
+    margin: 0 16px 16px;
 }
 </style>
