@@ -12,7 +12,7 @@ export interface AreaUpdateData {
     name?: string;
     category?: number | string;
     location?: string;
-    locationPoint: [number, number];
+    locationPoint?: [number, number];
     offlineFlags?: number;
 }
 
