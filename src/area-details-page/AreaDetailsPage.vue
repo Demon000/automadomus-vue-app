@@ -41,10 +41,17 @@
                     </div>
                     <div
                             class="property"
-                            v-if="area.owner"
+                            v-if="area.location"
                     >
                         <div class="type">Location</div>
                         <div class="value">{{ area.location }}</div>
+                    </div>
+                    <div
+                            class="property"
+                            v-if="area.locationPoint"
+                    >
+                        <div class="type">Location point</div>
+                        <div class="value">{{ area.locationPoint[0] }}, {{ area.locationPoint[1] }}</div>
                     </div>
                     <div
                             class="property"
