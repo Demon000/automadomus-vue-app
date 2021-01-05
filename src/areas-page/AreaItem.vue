@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { areaService } from '@/dependencies';
+import { areaService, userService } from '@/dependencies';
 import { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import Area from '@/models/Area';
 import { CONFIG_API_BASE_URL } from '@/config';
@@ -63,7 +63,7 @@ export default defineComponent({
     props: {
         area: {
             type: Object as () => Area,
-            default: undefined,
+            required: true,
         },
     },
     data() {
@@ -73,14 +73,12 @@ export default defineComponent({
     },
     computed: {
         areaCategoryText(): string | undefined {
-            if (!this.area) {
-                return undefined;
-            }
-
             return areaService.getAreaCategoryText(this.area.category);
         },
         areaImageUrl(): string {
-            return `${CONFIG_API_BASE_URL}/areas/${this.area.id}/image`;
+            return `${CONFIG_API_BASE_URL}/areas/${this.area.id}/thumbnail?` +
+                `access_token=${userService.getAccessToken()}&` +
+                `refresh_token=${userService.getRefreshToken()}`;
         },
     },
     methods: {

@@ -115,7 +115,7 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-import { areaService, RouteNames } from '@/dependencies';
+import { areaService, RouteNames, userService } from '@/dependencies';
 import Area from '@/models/Area';
 import { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import { CONFIG_API_BASE_URL } from '@/config';
@@ -151,8 +151,10 @@ export default defineComponent({
 
             return areaService.getAreaCategoryText(this.area.category);
         },
-        areaImageUrl(): string {
-            return `${CONFIG_API_BASE_URL}/areas/${this.areaId}/image`;
+        areaImageUrl(): string | undefined {
+            return `${CONFIG_API_BASE_URL}/areas/${this.areaId}/image?` +
+                    `access_token=${userService.getAccessToken()}&` +
+                    `refresh_token=${userService.getRefreshToken()}`;
         },
     },
     mounted() {
