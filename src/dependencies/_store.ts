@@ -52,7 +52,7 @@ export default createStore({
         loggedInUser(state: StoreState): User | undefined {
             return state.loggedInUser;
         },
-        areas(state: StoreState): Array<Area> {
+        areas(state: StoreState): Area[] {
             return Object.values(state.areasDetailsMap);
         },
         areaCategories(state: StoreState): AreaCategoriesMap {

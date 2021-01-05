@@ -1,5 +1,5 @@
 import API from '@/api/API';
-import { Position } from '@/models/Position';
+import Location from '@/models/Location';
 
 export default class GeocodeAPI {
     private api: API;
@@ -8,21 +8,22 @@ export default class GeocodeAPI {
         this.api = api;
     }
 
-    async forward(address: string): Promise<Position> {
-        const response = await this.api.baseRequest.get('/forward', {
+    async forward(address: string): Promise<Location> {
+        const response = await this.api.baseRequest.get('/geocode/forward', {
             params: {
                 address,
             },
         });
 
         return {
+            address: response.data.address,
             lat: response.data.latitude,
             lng: response.data.longitude,
         };
     }
 
-    async reverse(position: Position): Promise<string> {
-        const response = await this.api.baseRequest.get('/reverse', {
+    async reverse(position: Location): Promise<string> {
+        const response = await this.api.baseRequest.get('/geocode/reverse', {
             params: {
                 latitude: position.lat,
                 longitude: position.lng,

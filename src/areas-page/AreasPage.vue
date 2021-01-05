@@ -86,7 +86,7 @@ export default defineComponent({
     },
     data() {
         return {
-            items: [] as Array<Area>,
+            items: [] as Area[],
             page: -1,
             RouteNames: RouteNames,
             scrolledToBottom: false,

@@ -67,7 +67,7 @@ export default class AreaService {
         return this.areaRepository.getAreaCategoryText(value);
     }
 
-    async getOrLoadAreasPage(page = 0, limit = 0, searchText = ''): Promise<Array<Area> | false> {
+    async getOrLoadAreasPage(page = 0, limit = 0, searchText = ''): Promise<Area[] | false> {
         try {
             const areasPage = await this.areasAPI.areasGetPage(page, limit);
 

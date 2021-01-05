@@ -16,7 +16,7 @@ export default class AreaRepository {
         this.store = store;
     }
 
-    getAreasPaginated(page = 0, limit = 0, filterDeleted = true, searchText = ''): Array<Area> {
+    getAreasPaginated(page = 0, limit = 0, filterDeleted = true, searchText = ''): Area[] {
         let areas = this.store.getters.areas;
 
         if (filterDeleted) {
@@ -40,7 +40,7 @@ export default class AreaRepository {
             .slice(page * limit, (page + 1) * limit);
     }
 
-    getOfflineChangedAreas(): Array<Area> {
+    getOfflineChangedAreas(): Area[] {
         return this.store.getters.areas
             .filter((area: Area) => {
                 return !!area.offlineFlags;

@@ -5,12 +5,14 @@ export interface AreaAddData {
     name: string;
     category: number | string;
     location: string;
+    locationPoint: [number, number];
 }
 
 export interface AreaUpdateData {
     name?: string;
     category?: number | string;
     location?: string;
+    locationPoint: [number, number];
     offlineFlags?: number;
 }
 
@@ -20,11 +22,11 @@ export default interface Area {
     name: string;
     category: number;
     location: string;
+    locationPoint: [number, number];
 
     hasImage?: boolean;
     noDevices?: number;
     noControllers?: number;
-    locationPoint?: [number, number];
     offlineFlags?: number;
 }
 

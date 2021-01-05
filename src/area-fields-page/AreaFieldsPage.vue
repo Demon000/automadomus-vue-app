@@ -1,5 +1,8 @@
 <template>
-    <div class="page">
+    <div
+            class="page"
+            v-if="mode === PageMode.FIELDS"
+    >
         <app-sidebar></app-sidebar>
         <app-navbar
                 has-nav-button
@@ -54,9 +57,30 @@
                         </ui-textfield-icon>
                     </template>
                 </ui-textfield>
+
+                <div class="point-fields" v-if="editedArea.locationPoint">
+                    <ui-textfield
+                            class="ui-textfield"
+                            v-model="editedArea.locationPoint[0]"
+                    >
+                        Latitude
+                    </ui-textfield>
+                    <ui-textfield
+                            class="ui-textfield"
+                            v-model="editedArea.locationPoint[1]"
+                    >
+                        Longitude
+                    </ui-textfield>
+                </div>
             </div>
         </ui-card>
     </div>
+    <area-location-select-page
+            v-else-if="mode === PageMode.LOCATION"
+            :initial-location-point="initialLocationPoint"
+            @saveButtonClick="onLocationSelectSaveButtonClick"
+            @exitButtonClick="onLocationSelectExitButtonClick"
+    ></area-location-select-page>
 </template>
 
 <script lang="ts">
@@ -65,12 +89,20 @@ import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
 import { areaService } from '@/dependencies';
 import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption } from '@/models/Area';
+import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
+import Location, { LocationPoint } from '@/models/Location';
+
+enum PageMode {
+    FIELDS = 'fields',
+    LOCATION = 'location',
+}
 
 export default defineComponent({
     name: 'AreaFieldPage',
     components: {
         AppSidebar,
         AppNavbar,
+        AreaLocationSelectPage,
     },
     props: {
         areaId: {
@@ -83,12 +115,16 @@ export default defineComponent({
                 name: '',
                 category: 0,
                 location: '',
+                locationPoint: [0, 0],
             } as Area,
             editedArea: {
                 name: '',
                 category: 0,
                 location: '',
+                locationPoint: [0, 0],
             } as AreaAddData,
+            PageMode,
+            mode: PageMode.FIELDS,
             categories: {} as AreaCategoriesMap,
         };
     },
@@ -108,7 +144,7 @@ export default defineComponent({
 
             return '';
         },
-        categoriesSelectOptions(): Array<AreaCategorySelectOption> {
+        categoriesSelectOptions(): AreaCategorySelectOption[] {
             const categoriesSelectOptions = [];
 
             for (const [key, value] of Object.entries(this.categories)) {
@@ -119,6 +155,12 @@ export default defineComponent({
             }
 
             return categoriesSelectOptions;
+        },
+        initialLocationPoint(): LocationPoint {
+            return {
+                lat: this.editedArea.locationPoint[0],
+                lng: this.editedArea.locationPoint[1],
+            };
         },
     },
     watch: {
@@ -156,6 +198,7 @@ export default defineComponent({
             this.editedArea.name = area.name;
             this.editedArea.category = area.category;
             this.editedArea.location = area.location;
+            this.editedArea.locationPoint = area.locationPoint;
         },
         async onSaveUpdateButtonClick(): Promise<void> {
             if (!this.areaId) {
@@ -166,6 +209,7 @@ export default defineComponent({
                 name: this.editedArea.name,
                 category: this.editedArea.category,
                 location: this.editedArea.location,
+                locationPoint: this.editedArea.locationPoint,
             });
         },
         async onSaveAddButtonClick(): Promise<void> {
@@ -178,8 +222,16 @@ export default defineComponent({
                 await this.onSaveAddButtonClick();
             }
         },
+        async onLocationSelectSaveButtonClick(location: Location): Promise<void> {
+            this.editedArea.location = location.address;
+            this.editedArea.locationPoint = [location.lat, location.lng];
+            this.mode = PageMode.FIELDS;
+        },
+        async onLocationSelectExitButtonClick(): Promise<void> {
+            this.mode = PageMode.FIELDS;
+        },
         async onOpenMapButtonClick(): Promise<void> {
-            console.log('bla');
+            this.mode = PageMode.LOCATION;
         },
     },
 });
@@ -198,5 +250,17 @@ export default defineComponent({
 
 .ui-textfield {
     margin-bottom: 16px;
+}
+
+.point-fields {
+    display: flex;
+}
+
+.point-fields .ui-textfield {
+    flex-grow: 1;
+}
+
+.point-fields .ui-textfield:not(:last-child) {
+    margin-right: 16px;
 }
 </style>

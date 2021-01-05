@@ -11,5 +11,5 @@ export default interface Page<T> extends TotalItemsInfo {
     noPages: number;
     noPagesBefore: number;
     noPagesAfter: number;
-    items: Array<T>;
+    items: T[];
 }

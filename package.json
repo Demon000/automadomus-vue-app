@@ -10,6 +10,8 @@
   "dependencies": {
     "@capacitor/core": "^2.4.5",
     "@mdi/font": "^5.8.55",
+    "@types/leaflet": "^1.5.19",
+    "@vue-leaflet/vue-leaflet": "^0.5.0",
     "axios": "^0.21.1",
     "balm-ui": "^9.5.0",
     "bson-objectid": "^1.3.1",
@@ -17,6 +19,7 @@
     "eventemitter3": "^4.0.7",
     "flatpickr": "^4.6.9",
     "js-convert-case": "^4.1.0",
+    "leaflet": "^1.7.1",
     "vue": "^3.0.0",
     "vue-observe-visibility": "^1.0.0",
     "vue-router": "^4.0.2",

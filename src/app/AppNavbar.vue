@@ -87,6 +87,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.app-navbar {
+    z-index: 100;
+}
+
 .ui-top-app-bar {
     position: initial;
 }
