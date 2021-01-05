@@ -8,13 +8,9 @@ export interface AreaAddData {
     locationPoint: [number, number];
 }
 
-export interface AreaUpdateData {
-    name?: string;
-    category?: number | string;
-    location?: string;
-    locationPoint?: [number, number];
+export type AreaUpdateData = Partial<AreaAddData> & {
     offlineFlags?: number;
-}
+};
 
 export default interface Area {
     id: string;
