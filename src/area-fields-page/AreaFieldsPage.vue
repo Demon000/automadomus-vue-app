@@ -88,7 +88,7 @@ import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
 import { areaService } from '@/dependencies';
-import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption } from '@/models/Area';
+import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption, AreaUpdateData } from '@/models/Area';
 import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
 import Location, { LocationPoint } from '@/models/Location';
 
@@ -205,16 +205,23 @@ export default defineComponent({
                 return;
             }
 
-            const areaUpdateData = [
-                'name',
-                'category',
-                'location',
-                'locationPoint',
-            ].forEach(key => {
-                if (this.editedArea[key] !== this.area[key]) {
-                    areaUpdateData[key] = this.editedArea[key];
-                }
-            });
+            const areaUpdateData: AreaUpdateData = {};
+
+            if (this.area.name !== this.editedArea.name) {
+                areaUpdateData.name = this.editedArea.name;
+            }
+
+            if (this.area.category !== this.editedArea.category) {
+                areaUpdateData.category = this.editedArea.category;
+            }
+
+            if (this.area.location !== this.editedArea.location) {
+                areaUpdateData.location = this.editedArea.location;
+            }
+
+            if (this.area.locationPoint !== this.editedArea.locationPoint) {
+                areaUpdateData.locationPoint = this.editedArea.locationPoint;
+            }
 
             await areaService.updateArea(this.areaId, areaUpdateData);
         },
