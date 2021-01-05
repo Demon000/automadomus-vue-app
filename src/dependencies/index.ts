@@ -18,7 +18,7 @@ import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
 
-const _api = new API(CONFIG_API_BASE_URL, _store.getters.accessToken, _store.getters.refreshToken);
+const _api = new API(CONFIG_API_BASE_URL);
 
 const _geocodeApi = new GeocodeAPI(_api);
 const geocodeService = new GeocodeService(_geocodeApi);
@@ -29,6 +29,9 @@ const networkTrackingService = new NetworkTrackingService(_pingApi);
 const _userApi = new UserAPI(_api);
 const _userRepository = new UserRepository(_store);
 const userService = new UserService(_userApi, _userRepository);
+
+_api.setAccessToken(userService.getAccessToken());
+_api.setRefreshToken(userService.getRefreshToken());
 
 const _areasApi = new AreasAPI(_api);
 const _areaRepository = new AreaRepository(_store);
@@ -79,14 +82,11 @@ _api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
 });
 
 _api.emitter.on(APIEvents.ACCESS_TOKEN_UPDATED, async (token: string) => {
-    console.log('access');
-    _store.commit(_StoreMutations.SET_ACCESS_TOKEN, token);
-    _api.setAccessToken(token);
+    userService.setAccessToken(token);
 });
 
 _api.emitter.on(APIEvents.REFRESH_TOKEN_UPDATED, async (token: string) => {
-    console.log('refresh');
-    _store.commit(_StoreMutations.SET_REFRESH_TOKEN, token);
+    userService.setRefreshToken(token);
     _api.setRefreshToken(token);
 });
 

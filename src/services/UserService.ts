@@ -63,4 +63,20 @@ export default class UserService {
 
         return this.userRepository.getLoggedInUser();
     }
+
+    setAccessToken(token: string): void {
+        this.userRepository.setAccessToken(token);
+    }
+
+    setRefreshToken(token: string): void {
+        this.userRepository.setRefreshToken(token);
+    }
+
+    getAccessToken(): string {
+        return this.userRepository.getAccessToken();
+    }
+
+    getRefreshToken(): string {
+        return this.userRepository.getRefreshToken();
+    }
 }

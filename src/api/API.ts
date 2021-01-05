@@ -17,12 +17,10 @@ export default class API {
     public uninterceptedBaseRequest: AxiosInstance;
     public emitter: EventEmitter;
 
-    private accessToken: string;
-    private refreshToken: string;
+    private accessToken: string | undefined;
+    private refreshToken: string | undefined;
 
-    constructor(baseURL: string, accessToken: string, refreshToken: string) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+    constructor(baseURL: string) {
         this.emitter = new EventEmitter();
 
         const baseRequestConfig = {
@@ -56,14 +54,16 @@ export default class API {
 
         this.baseRequest.interceptors.response.use(
             (response: AxiosResponse) => {
-                console.log(response.headers);
-
-                if (response.headers[ACCESS_TOKEN_HEADER_NAME]) {
-                    this.emitter.emit(APIEvents.ACCESS_TOKEN_UPDATED, response.headers[ACCESS_TOKEN_HEADER_NAME]);
+                const accessToken = response.headers[ACCESS_TOKEN_HEADER_NAME];
+                if (accessToken) {
+                    this.setAccessToken(accessToken);
+                    this.emitter.emit(APIEvents.ACCESS_TOKEN_UPDATED, accessToken);
                 }
 
-                if (response.headers[REFRESH_TOKEN_HEADER_NAME]) {
-                    this.emitter.emit(APIEvents.REFRESH_TOKEN_UPDATED, response.headers[REFRESH_TOKEN_HEADER_NAME]);
+                const refreshToken = response.headers[REFRESH_TOKEN_HEADER_NAME];
+                if (refreshToken) {
+                    this.setRefreshToken(refreshToken);
+                    this.emitter.emit(APIEvents.REFRESH_TOKEN_UPDATED, refreshToken);
                 }
 
                 response.data = camelKeys(response.data, {
