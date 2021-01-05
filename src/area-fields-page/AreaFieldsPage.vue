@@ -253,7 +253,7 @@ export default defineComponent({
                 areaUpdateData.locationPoint = this.editedArea.locationPoint;
             }
 
-            if (this.area.image !== this.editedArea.image) {
+            if (this.area.image !== this.editedArea.image && this.editedArea.image) {
                 areaUpdateData.image = this.editedArea.image;
             }
 
