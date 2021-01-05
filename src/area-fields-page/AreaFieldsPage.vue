@@ -205,12 +205,18 @@ export default defineComponent({
                 return;
             }
 
-            await areaService.updateArea(this.areaId, {
-                name: this.editedArea.name,
-                category: this.editedArea.category,
-                location: this.editedArea.location,
-                locationPoint: this.editedArea.locationPoint,
+            const areaUpdateData = [
+                'name',
+                'category',
+                'location',
+                'locationPoint',
+            ].forEach(key => {
+                if (this.editedArea[key] !== this.area[key]) {
+                    areaUpdateData[key] = this.editedArea[key];
+                }
             });
+
+            await areaService.updateArea(this.areaId, areaUpdateData);
         },
         async onSaveAddButtonClick(): Promise<void> {
             await areaService.addArea(this.editedArea);
