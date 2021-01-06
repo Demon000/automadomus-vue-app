@@ -62,12 +62,14 @@
                     <div class="point-fields" v-if="editedArea.locationPoint">
                         <ui-textfield
                                 class="ui-textfield"
+                                outlined
                                 v-model="editedArea.locationPoint[0]"
                         >
                             Latitude
                         </ui-textfield>
                         <ui-textfield
                                 class="ui-textfield"
+                                outlined
                                 v-model="editedArea.locationPoint[1]"
                         >
                             Longitude
