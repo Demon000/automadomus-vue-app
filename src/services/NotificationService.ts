@@ -6,6 +6,6 @@ export default class NotificationService {
     constructor(baseURL: string) {
         this.socket = io(baseURL, {
             transports: ['websocket'],
-        }).connect();
+        });
     }
 }
