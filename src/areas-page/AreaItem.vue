@@ -92,9 +92,6 @@ export default defineComponent({
 <style scoped>
 .area-item {
     cursor: pointer;
-}
-
-.area-item-card {
     margin: 16px;
 }
 
