@@ -1,4 +1,4 @@
-import { CONFIG_API_BASE_URL } from '@/config';
+import { CONFIG_API_BASE_URL, CONFIG_SOCKET_BASE_URL } from '@/config';
 
 import _store, { _StoreMutations } from '@/dependencies/_store';
 import _router, { _RouteNames } from '@/dependencies/_router';
@@ -17,6 +17,7 @@ import { AxiosError } from 'axios';
 import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
+import NotificationService from '@/services/NotificationService';
 
 const _api = new API(CONFIG_API_BASE_URL);
 
@@ -40,6 +41,8 @@ const areaService = new AreaService(
     _areaRepository,
     _userRepository,
 );
+
+const notificationService = new NotificationService(CONFIG_SOCKET_BASE_URL);
 
 async function createErrorToast(err: Error) {
     let message = `${err.message}<br>`;
@@ -169,6 +172,7 @@ export {
     userService,
     areaService,
     geocodeService,
+    notificationService,
     _store as store,
     _router as router,
     _StoreMutations as StoreMutations,
