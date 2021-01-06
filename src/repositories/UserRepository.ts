@@ -19,11 +19,11 @@ export default class UserRepository {
         return this.store.getters.loggedInUser;
     }
 
-    setAccessToken(token: string) {
+    setAccessToken(token: string): void {
         _store.commit(_StoreMutations.SET_ACCESS_TOKEN, token);
     }
 
-    setRefreshToken(token: string) {
+    setRefreshToken(token: string): void {
         _store.commit(_StoreMutations.SET_REFRESH_TOKEN, token);
     }
 

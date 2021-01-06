@@ -2,8 +2,6 @@ import EventEmitter from 'eventemitter3';
 
 import PingAPI from '@/api/PingAPI';
 
-type NetworkTrackerCallback = (status: boolean) => void;
-
 export enum NetworkTrackerEvent {
     STATUS_CHANGE = 'status-change',
 }
