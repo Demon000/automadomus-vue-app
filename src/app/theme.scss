@@ -1,0 +1,6 @@
+@use '@material/theme' with (
+  $primary: #0070ff,
+  $secondary: #0046cb,
+);
+
+@use 'balm-ui/components/core';
