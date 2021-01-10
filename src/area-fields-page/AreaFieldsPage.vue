@@ -271,15 +271,15 @@ export default defineComponent({
                 await this.onSaveAddButtonClick();
             }
         },
-        async onLocationSelectSaveButtonClick(location: Location): Promise<void> {
+        onLocationSelectSaveButtonClick(location: Location): void {
             this.editedArea.location = location.address;
             this.editedArea.locationPoint = [location.lat, location.lng];
             this.mode = PageMode.FIELDS;
         },
-        async onLocationSelectExitButtonClick(): Promise<void> {
+        onLocationSelectExitButtonClick(): void {
             this.mode = PageMode.FIELDS;
         },
-        async onOpenMapButtonClick(): Promise<void> {
+        onOpenMapButtonClick(): void {
             this.mode = PageMode.LOCATION;
         },
         async onOpenCameraButtonClick() {
