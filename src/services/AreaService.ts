@@ -114,6 +114,11 @@ export default class AreaService {
         return this.areaRepository.getAreaDetails(id);
     }
 
+    setAreaDetails(area: Area): void {
+        this.areaRepository.setAreaDetails(area);
+        this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
+    }
+
     async addArea(data: AreaAddData, handleNetworkError = true, emitEvent = true): Promise<boolean> {
         let areaResponse;
 

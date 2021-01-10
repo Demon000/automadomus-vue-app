@@ -13,7 +13,7 @@
                             v-if="area.hasImage"
                             square
                             :style="{
-                                backgroundImage: `url('${areaImageUrl}')`,
+                                backgroundImage: areaImageUrl,
                             }"
                     ></ui-card-media>
                     <div class="text">
@@ -72,9 +72,11 @@ export default defineComponent({
             return areaService.getAreaCategoryText(this.area.category);
         },
         areaImageUrl(): string {
-            return `${CONFIG_API_BASE_URL}/areas/${this.area.id}/thumbnail?` +
-                `access_token=${userService.getAccessToken()}&` +
-                `refresh_token=${userService.getRefreshToken()}`;
+            if (!this.area.hasImage) {
+                return '';
+            }
+
+            return `url(data:image/png;base64,${this.area.thumbnail})`;
         },
     },
     methods: {

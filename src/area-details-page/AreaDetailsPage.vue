@@ -30,7 +30,7 @@
                             class="media"
                             v-if="area.hasImage"
                             :style="{
-                            backgroundImage: `url('${areaImageUrl}')`,
+                            backgroundImage: areaImageUrl,
                         }"
                     ></ui-card-media>
                     <div class="content">
@@ -151,10 +151,17 @@ export default defineComponent({
 
             return areaService.getAreaCategoryText(this.area.category);
         },
-        areaImageUrl(): string | undefined {
-            return `${CONFIG_API_BASE_URL}/areas/${this.areaId}/image?` +
-                    `access_token=${userService.getAccessToken()}&` +
-                    `refresh_token=${userService.getRefreshToken()}`;
+        areaImageUrl(): string {
+            if (!this.area || !this.area.hasImage) {
+                return '';
+            }
+
+            const image = this.area.image || this.area.thumbnail;
+            if (!image) {
+                return '';
+            }
+
+            return `url(data:image/png;base64,${image})`;
         },
     },
     mounted() {

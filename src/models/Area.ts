@@ -22,6 +22,8 @@ export default interface Area {
     locationPoint: [number, number];
 
     image?: string;
+    thumbnail?: string;
+
     hasImage?: boolean;
     noDevices?: number;
     noControllers?: number;

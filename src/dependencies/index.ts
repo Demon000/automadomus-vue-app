@@ -103,6 +103,10 @@ networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () =>
     await areaService.syncOfflineChanges();
 });
 
+notificationService.emitter.on(NotificationServiceEvents.AREA_UPDATED, async (area) => {
+    await areaService.setAreaDetails(area);
+});
+
 notificationService.emitter.on(NotificationServiceEvents.CONNECTION, () => {
     const accessToken = userService.getAccessToken();
     notificationService.authenticate(accessToken);
