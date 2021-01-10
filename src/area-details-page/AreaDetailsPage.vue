@@ -115,10 +115,9 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-import { areaService, RouteNames, userService } from '@/dependencies';
+import { areaService, RouteNames } from '@/dependencies';
 import Area from '@/models/Area';
 import { AreaOfflineFlags } from '@/repositories/AreaRepository';
-import { CONFIG_API_BASE_URL } from '@/config';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
@@ -140,7 +139,6 @@ export default defineComponent({
         return {
             area: undefined as Area | undefined,
             AreaOfflineFlags,
-            CONFIG_API_BASE_URL,
         };
     },
     computed: {

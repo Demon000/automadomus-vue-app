@@ -49,10 +49,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { areaService, userService } from '@/dependencies';
+import { areaService } from '@/dependencies';
 import { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import Area from '@/models/Area';
-import { CONFIG_API_BASE_URL } from '@/config';
 
 export default defineComponent({
     name: 'AreaItem',
