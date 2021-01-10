@@ -42,6 +42,9 @@
                 </span>
             </div>
         </div>
+        <div class="banner">
+            <slot name="banner"></slot>
+        </div>
     </div>
 </template>
 
@@ -89,6 +92,8 @@ export default defineComponent({
 <style scoped>
 .app-navbar {
     z-index: 100;
+
+    overflow: visible;
 }
 
 .ui-top-app-bar {
@@ -113,5 +118,10 @@ export default defineComponent({
 
     color: var(--navbar-network-tracker-fg-color);
     padding: 4px 0;
+}
+
+.banner {
+    overflow: visible;
+    position: relative;
 }
 </style>

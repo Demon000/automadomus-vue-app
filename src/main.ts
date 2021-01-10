@@ -1,6 +1,6 @@
 import '@mdi/font/css/materialdesignicons.css';
 import '@/app/index.css';
-import '@/app/index.scss';
+import '@/app/theme.scss';
 
 import { createApp, VNode } from 'vue';
 import BalmUI from 'balm-ui';

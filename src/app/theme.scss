@@ -1,6 +1,19 @@
-@use '@material/theme' with (
+@use '~@material/theme' with (
   $primary: #0070ff,
   $secondary: #0046cb,
 );
 
-@use 'balm-ui/components/core';
+@use '~balm-ui/components/core';
+@use '~balm-ui/components/form-field/form-item';
+@use '~balm-ui/components/textfield/textfield';
+@use '~balm-ui/components/fab/fab';
+@use '~balm-ui/components/card/card';
+@use '~balm-ui/components/icon-button/icon-button';
+@use '~balm-ui/components/top-app-bar/top-app-bar';
+@use '~balm-ui/components/list/list';
+@use '~balm-ui/components/menu/menu';
+@use '~balm-ui/components/select/select';
+@use '~balm-ui/components/tooltip/tooltip';
+@use '~balm-ui/components/banner/banner';
+@use '~balm-ui/components/button/button';
+@use '~balm-ui/directives/elevation/elevation';

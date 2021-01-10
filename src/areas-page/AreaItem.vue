@@ -31,14 +31,10 @@
                         </div>
                         <div
                                 class="offline-marker"
-                                v-if="
-                                hasOfflineFlag(AreaOfflineFlags.ADDED
-                                | AreaOfflineFlags.UPDATED
-                                | AreaOfflineFlags.DELETED)
-                            "
-                                :class="{
-                                'deleted': hasOfflineFlag(AreaOfflineFlags.DELETED),
-                            }"
+                                v-if="hasOfflineFlag(AreaOfflineFlags.ADDED
+                                        | AreaOfflineFlags.UPDATED
+                                        | AreaOfflineFlags.DELETED)
+                                "
                         >
                             <ui-icon-button>
                                 <i class="mdi mdi-sync-alert"></i>
@@ -115,10 +111,6 @@ export default defineComponent({
     top: 16px;
 
     display: flex;
-}
-
-.offline-marker.deleted {
-    color: #b00020;
 }
 
 .offline-marker .mdc-icon-button {

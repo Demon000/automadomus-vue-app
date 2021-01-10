@@ -17,7 +17,7 @@ import { AxiosError } from 'axios';
 import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
-import NotificationService from '@/services/NotificationService';
+import NotificationService, { NotificationServiceEvents } from '@/services/NotificationService';
 
 const _api = new API(CONFIG_API_BASE_URL);
 
@@ -31,6 +31,8 @@ const _userApi = new UserAPI(_api);
 const _userRepository = new UserRepository(_store);
 const userService = new UserService(_userApi, _userRepository);
 
+const notificationService = new NotificationService(CONFIG_SOCKET_BASE_URL);
+
 _api.setAccessToken(userService.getAccessToken());
 _api.setRefreshToken(userService.getRefreshToken());
 
@@ -41,8 +43,6 @@ const areaService = new AreaService(
     _areaRepository,
     _userRepository,
 );
-
-const notificationService = new NotificationService(CONFIG_SOCKET_BASE_URL);
 
 async function createErrorToast(err: Error) {
     let message = `${err.message}<br>`;
@@ -86,11 +86,11 @@ _api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
 
 _api.emitter.on(APIEvents.ACCESS_TOKEN_UPDATED, async (token: string) => {
     userService.setAccessToken(token);
+    notificationService.authenticate(token);
 });
 
 _api.emitter.on(APIEvents.REFRESH_TOKEN_UPDATED, async (token: string) => {
     userService.setRefreshToken(token);
-    _api.setRefreshToken(token);
 });
 
 networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () => {
@@ -99,7 +99,13 @@ networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () =>
         return;
     }
 
+    notificationService.connect();
     await areaService.syncOfflineChanges();
+});
+
+notificationService.emitter.on(NotificationServiceEvents.CONNECTION, () => {
+    const accessToken = userService.getAccessToken();
+    notificationService.authenticate(accessToken);
 });
 
 userService.emitter.on(
