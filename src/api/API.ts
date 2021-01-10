@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { camelKeys, snakeKeys } from 'js-convert-case/lib';
-import { isNetworkError } from '@/utils/misc';
+import { isNetworkError, objectToSnake, objectToCamel } from '@/utils/misc';
 import EventEmitter from 'eventemitter3';
 
 export enum APIEvents {
@@ -41,10 +40,8 @@ export default class API {
                     config.headers[REFRESH_TOKEN_HEADER_NAME] = this.refreshToken;
                 }
 
-                config.data = snakeKeys(config.data, {
-                    recursive: true,
-                    recursiveInArray: true,
-                });
+                config.data = objectToSnake(config.data);
+
                 return config;
             },
             (error: Error) => {
@@ -66,10 +63,7 @@ export default class API {
                     this.emitter.emit(APIEvents.REFRESH_TOKEN_UPDATED, refreshToken);
                 }
 
-                response.data = camelKeys(response.data, {
-                    recursive: true,
-                    recursiveInArray: true,
-                });
+                response.data = objectToCamel(response.data);
                 return response;
             },
             (error: Error) => {
