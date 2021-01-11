@@ -6,7 +6,7 @@
         <app-sidebar></app-sidebar>
         <app-navbar
                 has-nav-button
-                :title="title"
+                :title="areaTitle"
         >
             <template #toolbar>
                 <ui-icon-button
