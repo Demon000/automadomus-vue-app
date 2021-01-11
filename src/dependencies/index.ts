@@ -3,7 +3,7 @@ import { CONFIG_API_BASE_URL, CONFIG_SOCKET_BASE_URL } from '@/config';
 import _store, { _StoreMutations } from '@/dependencies/_store';
 import _router, { _RouteNames } from '@/dependencies/_router';
 
-import API, { APIEvents } from '@/api/API';
+import API, { APIEvent } from '@/api/API';
 import UserAPI from '@/api/UserAPI';
 import UserRepository from '@/repositories/UserRepository';
 import UserService, { UserServiceEvent } from '@/services/UserService';
@@ -15,7 +15,7 @@ import NetworkTrackingService, { NetworkTrackerEvent } from '@/services/NetworkT
 import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
-import NotificationService, { NotificationServiceEvents } from '@/services/NotificationService';
+import NotificationService, { NotificationServiceEvent } from '@/services/NotificationService';
 import { APIError, errorToHTMLString } from '@/models/APIErrors';
 
 const _api = new API(CONFIG_API_BASE_URL);
@@ -62,7 +62,7 @@ async function redirectToIndex() {
     });
 }
 
-_api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
+_api.emitter.on(APIEvent.NETWORK_ERROR, async () => {
     try {
         networkTrackingService.checkServerConnection();
     } catch (err) {
@@ -70,12 +70,12 @@ _api.emitter.on(APIEvents.NETWORK_ERROR, async () => {
     }
 });
 
-_api.emitter.on(APIEvents.ACCESS_TOKEN_UPDATED, async (token: string) => {
+_api.emitter.on(APIEvent.ACCESS_TOKEN_UPDATED, async (token: string) => {
     userService.setAccessToken(token);
     notificationService.authenticate(token);
 });
 
-_api.emitter.on(APIEvents.REFRESH_TOKEN_UPDATED, async (token: string) => {
+_api.emitter.on(APIEvent.REFRESH_TOKEN_UPDATED, async (token: string) => {
     userService.setRefreshToken(token);
 });
 
@@ -89,11 +89,11 @@ networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () =>
     await areaService.syncOfflineChanges();
 });
 
-notificationService.emitter.on(NotificationServiceEvents.AREA_UPDATED, async (area) => {
+notificationService.emitter.on(NotificationServiceEvent.AREA_UPDATED, async (area) => {
     await areaService.setAreaDetails(area);
 });
 
-notificationService.emitter.on(NotificationServiceEvents.CONNECTION, () => {
+notificationService.emitter.on(NotificationServiceEvent.CONNECTION, () => {
     const accessToken = userService.getAccessToken();
     notificationService.authenticate(accessToken);
 });

@@ -3,7 +3,7 @@ import { objectToSnake, objectToCamel } from '@/utils/case';
 import EventEmitter from 'eventemitter3';
 import { isNetworkError } from '@/utils/network';
 
-export enum APIEvents {
+export enum APIEvent {
     NETWORK_ERROR = 'network-error',
     ACCESS_TOKEN_UPDATED = 'access-token-updated',
     REFRESH_TOKEN_UPDATED = 'refresh-token-update',
@@ -55,13 +55,13 @@ export default class API {
                 const accessToken = response.headers[ACCESS_TOKEN_HEADER_NAME];
                 if (accessToken) {
                     this.setAccessToken(accessToken);
-                    this.emitter.emit(APIEvents.ACCESS_TOKEN_UPDATED, accessToken);
+                    this.emitter.emit(APIEvent.ACCESS_TOKEN_UPDATED, accessToken);
                 }
 
                 const refreshToken = response.headers[REFRESH_TOKEN_HEADER_NAME];
                 if (refreshToken) {
                     this.setRefreshToken(refreshToken);
-                    this.emitter.emit(APIEvents.REFRESH_TOKEN_UPDATED, refreshToken);
+                    this.emitter.emit(APIEvent.REFRESH_TOKEN_UPDATED, refreshToken);
                 }
 
                 response.data = objectToCamel(response.data);
@@ -69,7 +69,7 @@ export default class API {
             },
             (error: AxiosError) => {
                 if (isNetworkError(error)) {
-                    this.emitter.emit(APIEvents.NETWORK_ERROR, error);
+                    this.emitter.emit(APIEvent.NETWORK_ERROR, error);
                 }
 
                 if (error.response && error.response.data) {

@@ -121,7 +121,7 @@ import AreaItem from '@/areas-page/AreaItem.vue';
 import { AreaServiceEvent } from '@/services/AreaService';
 import AppBanner from '@/app/AppBanner.vue';
 import HeightTransition from '@/util-components/HeightTransition.vue';
-import { NotificationServiceEvents } from '@/services/NotificationService';
+import { NotificationServiceEvent } from '@/services/NotificationService';
 
 export default defineComponent({
     name: 'AreasPage',
@@ -148,13 +148,13 @@ export default defineComponent({
         this.reloadPages();
 
         areaService.emitter.on(AreaServiceEvent.SYNC_DONE, this.onSyncDone, this);
-        notificationService.emitter.on(NotificationServiceEvents.AREA_ADDED, this.onAreaAddedDeleted, this);
-        notificationService.emitter.on(NotificationServiceEvents.AREA_DELETED, this.onAreaAddedDeleted, this);
+        notificationService.emitter.on(NotificationServiceEvent.AREA_ADDED, this.onAreaAddedDeleted, this);
+        notificationService.emitter.on(NotificationServiceEvent.AREA_DELETED, this.onAreaAddedDeleted, this);
     },
     beforeUnmount() {
         areaService.emitter.off(AreaServiceEvent.SYNC_DONE, this.onSyncDone);
-        notificationService.emitter.off(NotificationServiceEvents.AREA_ADDED, this.onAreaAddedDeleted, this);
-        notificationService.emitter.off(NotificationServiceEvents.AREA_DELETED, this.onAreaAddedDeleted, this);
+        notificationService.emitter.off(NotificationServiceEvent.AREA_ADDED, this.onAreaAddedDeleted, this);
+        notificationService.emitter.off(NotificationServiceEvent.AREA_DELETED, this.onAreaAddedDeleted, this);
     },
     methods: {
         onSearchTextSubmit() {

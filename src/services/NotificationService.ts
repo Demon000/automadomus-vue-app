@@ -3,7 +3,7 @@ import EventEmitter from 'eventemitter3';
 import Area from '@/models/Area';
 import { objectToCamel } from '@/utils/case';
 
-export enum NotificationServiceEvents {
+export enum NotificationServiceEvent {
     CONNECTION = 'connection',
     AUTHENTICATE_ERROR = 'authenticate-error',
     AREA_ADDED = 'area-added',
@@ -11,7 +11,7 @@ export enum NotificationServiceEvents {
     AREA_DELETED = 'area-deleted',
 }
 
-enum SocketEvents {
+enum SocketEvent {
     CONNECT = 'connect',
     AUTHENTICATE = 'authenticate',
     AUTHENTICATE_ERROR = 'authenticate-error',
@@ -32,27 +32,27 @@ export default class NotificationService {
             transports: ['websocket'],
         });
 
-        this.socket.on(SocketEvents.CONNECT, () => {
-            this.emitter.emit(NotificationServiceEvents.CONNECTION);
+        this.socket.on(SocketEvent.CONNECT, () => {
+            this.emitter.emit(NotificationServiceEvent.CONNECTION);
         });
 
-        this.socket.on(SocketEvents.AUTHENTICATE_ERROR, (error: any) => {
-            this.emitter.emit(NotificationServiceEvents.AUTHENTICATE_ERROR, error);
+        this.socket.on(SocketEvent.AUTHENTICATE_ERROR, (error: any) => {
+            this.emitter.emit(NotificationServiceEvent.AUTHENTICATE_ERROR, error);
         });
 
-        this.socket.on(SocketEvents.AREA_ADDED, (areaData: any) => {
+        this.socket.on(SocketEvent.AREA_ADDED, (areaData: any) => {
             const area = objectToCamel(areaData) as Area;
-            this.emitter.emit(NotificationServiceEvents.AREA_ADDED, area);
+            this.emitter.emit(NotificationServiceEvent.AREA_ADDED, area);
         });
 
-        this.socket.on(SocketEvents.AREA_UPDATED, (areaData: any) => {
+        this.socket.on(SocketEvent.AREA_UPDATED, (areaData: any) => {
             const area = objectToCamel(areaData) as Area;
-            this.emitter.emit(NotificationServiceEvents.AREA_UPDATED, area);
+            this.emitter.emit(NotificationServiceEvent.AREA_UPDATED, area);
         });
 
-        this.socket.on(SocketEvents.AREA_DELETED, (areaData: any) => {
+        this.socket.on(SocketEvent.AREA_DELETED, (areaData: any) => {
             const area = objectToCamel(areaData) as Area;
-            this.emitter.emit(NotificationServiceEvents.AREA_DELETED, area);
+            this.emitter.emit(NotificationServiceEvent.AREA_DELETED, area);
         });
 
         if (this.debug) {
@@ -71,6 +71,6 @@ export default class NotificationService {
             return;
         }
 
-        this.socket.emit(SocketEvents.AUTHENTICATE, accessToken);
+        this.socket.emit(SocketEvent.AUTHENTICATE, accessToken);
     }
 }
