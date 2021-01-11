@@ -2,9 +2,8 @@ import { Store } from 'vuex';
 import StoreState from '@/models/StoreState';
 import Area, {
     AreaCategoriesMap,
-    AreaUpdateData,
     areaHasAnyFlag,
-    areaHasOfflineDeletedFlag,
+    areaHasOfflineDeletedFlag, areaHasFlag, AreaAddData, AreaUpdateData,
 } from '@/models/Area';
 import { StoreMutations } from '@/dependencies';
 
@@ -46,10 +45,10 @@ export default class AreaRepository {
             .slice(page * limit, (page + 1) * limit);
     }
 
-    getFlaggedAreas(): Area[] {
+    getFlaggedAreas(flag: number): Area[] {
         return this.store.getters.areas
             .filter((area: Area) => {
-                return areaHasAnyFlag(area);
+                return areaHasFlag(area, flag);
             });
     }
 
@@ -103,7 +102,7 @@ export default class AreaRepository {
         }, id);
     }
 
-    setAreaOfflineUpdate(id: string, data: AreaUpdateData | undefined): void {
+    setAreaSavedUpdate(id: string, data: AreaUpdateData | undefined): void {
         const area = this.getArea(id);
         if (!area) {
             console.error(`Trying to set offline update data for a non-existent area with id ${id}`, data);
@@ -118,7 +117,7 @@ export default class AreaRepository {
         }, id);
     }
 
-    clearAreaOfflineUpdate(id: string): void {
+    clearAreaSavedUpdate(id: string): void {
         this.setArea({
             savedUpdateData: undefined,
         }, id);

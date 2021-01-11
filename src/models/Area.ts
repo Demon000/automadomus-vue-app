@@ -6,12 +6,9 @@ export enum AreaFlags {
     OFFLINE_UPDATED = 1 << 1,
     OFFLINE_DELETED = 1 << 2,
     UPDATE_CONFLICT = 1 << 3,
+    ANY_OFFLINE_FLAG = OFFLINE_ADDED | OFFLINE_UPDATED | OFFLINE_DELETED,
+    ANY_FLAG = OFFLINE_ADDED | OFFLINE_UPDATED | OFFLINE_DELETED | UPDATE_CONFLICT,
 }
-
-export const AreaAnyFlag = AreaFlags.OFFLINE_ADDED |
-    AreaFlags.OFFLINE_UPDATED |
-    AreaFlags.OFFLINE_DELETED |
-    AreaFlags.UPDATE_CONFLICT;
 
 export interface AreaAddData {
     name: string;
@@ -34,9 +31,7 @@ export default interface Area {
     locationPoint: [number, number];
     createdAtTimestamp: number;
     updatedAtTimestamp: number;
-
     image?: string;
-    thumbnail?: string;
 
     noDevices?: number;
     noControllers?: number;
@@ -74,7 +69,7 @@ export function areaHasFlag(area: Area | undefined, flag: number): boolean {
 }
 
 export function areaHasAnyFlag(area: Area | undefined): boolean {
-    return areaHasFlag(area, AreaAnyFlag);
+    return areaHasFlag(area, AreaFlags.ANY_FLAG);
 }
 
 export function areaHasOfflineAddedFlag(area: Area | undefined): boolean {

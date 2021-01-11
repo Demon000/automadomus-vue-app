@@ -8,10 +8,12 @@
                 <ui-icon-button
                         v-if="areaHasUpdateConflictFlag"
                         @click="onSolveConflictsButtonClick"
+                        class="merge-conflict-button"
                 >
                     <i class="mdi mdi-call-merge"></i>
                 </ui-icon-button>
                 <ui-icon-button
+                        v-if="!areaHasUpdateConflictFlag"
                         @click="onEditButtonClick"
                 >
                     <i class="mdi mdi-pencil"></i>
@@ -91,6 +93,11 @@
                         </div>
 
                         <div class="property">
+                            <div class="type">Update conflict</div>
+                            <div class="value">{{ areaHasUpdateConflictFlag }}</div>
+                        </div>
+
+                        <div class="property">
                             <div class="type">Added offline</div>
                             <div class="value">{{ areaHasOfflineAddedFlag }}</div>
                         </div>
@@ -115,7 +122,7 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-import { areaService, RouteNames } from '@/dependencies';
+import { areaService, notificationService, RouteNames } from '@/dependencies';
 import Area, {
     areaHasOfflineAddedFlag,
     areaHasOfflineDeletedFlag,
@@ -124,6 +131,7 @@ import Area, {
     areaOverrideUpdateData,
 } from '@/models/Area';
 import { base64ImageToUrl } from '@/utils/image';
+import { NotificationServiceEvent } from '@/services/NotificationService';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
@@ -134,11 +142,6 @@ export default defineComponent({
     props: {
         areaId: {
             type: String,
-        },
-    },
-    watch: {
-        areaId() {
-            this.reloadArea();
         },
     },
     data() {
@@ -166,7 +169,7 @@ export default defineComponent({
                 return '';
             }
 
-            return base64ImageToUrl(this.areaVisible.image || this.areaVisible.thumbnail);
+            return base64ImageToUrl(this.areaVisible.image);
         },
         areaHasOfflineAddedFlag(): boolean {
             return areaHasOfflineAddedFlag(this.areaVisible);
@@ -183,8 +186,16 @@ export default defineComponent({
     },
     mounted() {
         this.reloadArea();
+
+        notificationService.emitter.on(NotificationServiceEvent.AREA_UPDATED, this.onAreaUpdated);
+    },
+    beforeUnmount() {
+        notificationService.emitter.off(NotificationServiceEvent.AREA_UPDATED, this.onAreaUpdated);
     },
     methods: {
+        async onAreaUpdated() {
+            await this.reloadArea();
+        },
         async reloadArea() {
             if (!this.areaId) {
                 return;
@@ -264,5 +275,9 @@ export default defineComponent({
 .media {
     width: 100%;
     height: 360px;
+}
+
+.merge-conflict-button {
+    color: #dd2c00;
 }
 </style>

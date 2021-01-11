@@ -3,7 +3,7 @@ import EventEmitter from 'eventemitter3';
 import UserRepository from '@/repositories/UserRepository';
 import UserAPI from '@/api/UserAPI';
 import User, { UserLoginData } from '@/models/User';
-import { isNetworkError } from '@/utils/network';
+import { isNetworkError } from '@/utils/errors';
 
 export enum UserServiceEvent {
     USER_LOGGED_IN = 'user-logged-in',

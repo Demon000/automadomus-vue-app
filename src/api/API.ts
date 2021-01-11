@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { objectToSnake, objectToCamel } from '@/utils/case';
 import EventEmitter from 'eventemitter3';
-import { isNetworkError } from '@/utils/network';
+import { isNetworkError } from '@/utils/errors';
 
 export enum APIEvent {
     NETWORK_ERROR = 'network-error',

@@ -2,20 +2,22 @@ import EventEmitter from 'eventemitter3';
 import ObjectID from 'bson-objectid';
 
 import Area, {
-    AreaCategoriesMap,
     AreaAddData,
-    AreaUpdateData,
-    areaHasFlag,
+    AreaCategoriesMap,
     AreaFlags,
     areaHasAnyFlag,
+    areaHasFlag,
     areaHasOfflineAddedFlag,
-    areaHasOfflineDeletedFlag, areaHasOfflineUpdatedFlag,
+    areaHasOfflineDeletedFlag,
+    areaHasOfflineUpdatedFlag,
+    AreaUpdateData,
 } from '@/models/Area';
 
 import AreasAPI from '@/api/AreasAPI';
 import AreaRepository from '@/repositories/AreaRepository';
 import UserRepository from '@/repositories/UserRepository';
-import { isNetworkError } from '@/utils/network';
+import { isNetworkError } from '@/utils/errors';
+import { isErrorAreaUpdatedAtInvalid } from '@/models/APIErrors';
 
 export enum AreaServiceEvent {
     AREA_GET_CATEGORIES_ERROR = 'area-get-categories-error',
@@ -170,7 +172,7 @@ export default class AreaService {
     }
 
     async updateArea(id: string, data: AreaUpdateData, handleNetworkError = true,
-        emitEvent = true): Promise<void> {
+        emitEvent = true, clearConflict = false, skipUpdatedAtInvalid = true): Promise<void> {
         try {
             let response;
 
@@ -181,18 +183,29 @@ export default class AreaService {
             }
 
             this.areaRepository.setArea(response, id);
+
+            if (clearConflict) {
+                this.areaRepository.clearAreaFlags(id);
+                this.areaRepository.clearAreaSavedUpdate(id);
+            }
         } catch (err) {
+            let setUpdateConflict = false;
             if (!isNetworkError(err)) {
-                this.emitter.emit(AreaServiceEvent.AREA_UPDATE_ERROR, err);
-                throw err;
+                if (skipUpdatedAtInvalid && isErrorAreaUpdatedAtInvalid(err)) {
+                    setUpdateConflict = true;
+                } else {
+                    this.emitter.emit(AreaServiceEvent.AREA_UPDATE_ERROR, err);
+                    throw err;
+                }
             }
 
             if (!handleNetworkError) {
                 throw err;
             }
 
-            this.areaRepository.setAreaOfflineUpdate(id, data);
-            this.areaRepository.setAreaFlag(id, AreaFlags.OFFLINE_UPDATED);
+            this.areaRepository.setAreaSavedUpdate(id, data);
+            const flag = setUpdateConflict ? AreaFlags.UPDATE_CONFLICT : AreaFlags.OFFLINE_UPDATED;
+            this.areaRepository.setAreaFlag(id, flag);
         }
 
         const area = this.areaRepository.getArea(id);
@@ -280,7 +293,7 @@ export default class AreaService {
         try {
             await this.updateArea(area.id, area.savedUpdateData, false, false);
             this.areaRepository.clearAreaFlags(area.id);
-            this.areaRepository.clearAreaOfflineUpdate(area.id);
+            this.areaRepository.clearAreaSavedUpdate(area.id);
         } catch (err) {
             console.error(err);
             this.areaRepository.setAreaFlag(area.id, AreaFlags.UPDATE_CONFLICT);
@@ -294,7 +307,9 @@ export default class AreaService {
     }
 
     async syncOfflineChanges(): Promise<void> {
-        const areas = this.areaRepository.getFlaggedAreas();
+        const areas = this.areaRepository.getFlaggedAreas(AreaFlags.OFFLINE_ADDED |
+            AreaFlags.OFFLINE_UPDATED |
+            AreaFlags.OFFLINE_DELETED);
 
         for (const area of areas) {
             await this.syncAreaOfflineChanges(area);

@@ -32,7 +32,7 @@
                     </ui-textfield>
                     <div
                             class="diff"
-                            v-if="newArea.name !== oldArea.name"
+                            v-if="showNameDiffSelector"
                     >
                         <div
                                 class="minus"
@@ -59,7 +59,7 @@
                     </ui-select>
                     <div
                             class="diff"
-                            v-if="newArea.category !== oldArea.category"
+                            v-if="showCategoryDiffSelector"
                     >
                         <div
                                 class="minus"
@@ -94,7 +94,7 @@
                     </ui-textfield>
                     <div
                             class="diff"
-                            v-if="newArea.location !== oldArea.location"
+                            v-if="showLocationDiffSelector"
                     >
                         <div
                                 class="minus"
@@ -110,7 +110,7 @@
                         </div>
                     </div>
 
-                    <div class="point-fields" v-if="editedArea.locationPoint">
+                    <div class="point-fields">
                         <ui-textfield
                                 class="ui-textfield"
                                 outlined
@@ -125,25 +125,23 @@
                         >
                             Longitude
                         </ui-textfield>
+                    </div>
+
+                    <div
+                            class="diff"
+                            v-if="showLocationPointDiffSelector"
+                    >
                         <div
-                                class="diff"
-                                v-if="
-                                    newArea.locationPoint[0] !== oldArea.locationPoint[0] ||
-                                    newArea.locationPoint[1] !== oldArea.locationPoint[1]
-                                "
+                                class="minus"
+                                @click="loadAreaLocationPointInto(oldArea, editedArea)"
                         >
-                            <div
-                                    class="minus"
-                                    @click="loadAreaLocationPointInto(oldArea, editedArea)"
-                            >
-                                {{ oldArea.locationPoint[0] }}, {{ oldArea.locationPoint[1] }}
-                            </div>
-                            <div
-                                    class="plus"
-                                    @click="loadAreaLocationPointInto(newArea, editedArea)"
-                            >
-                                {{ newArea.locationPoint[0] }}, {{ newArea.locationPoint[1] }}
-                            </div>
+                            {{ oldArea.locationPoint[0] }}, {{ oldArea.locationPoint[1] }}
+                        </div>
+                        <div
+                                class="plus"
+                                @click="loadAreaLocationPointInto(newArea, editedArea)"
+                        >
+                            {{ newArea.locationPoint[0] }}, {{ newArea.locationPoint[1] }}
                         </div>
                     </div>
 
@@ -168,7 +166,7 @@
 
                     <ui-card
                             outlined
-                            v-if="areaImageUrl"
+                            v-if="!selectedImageIsNewOrOld"
                     >
                         <ui-card-media
                                 square
@@ -180,12 +178,15 @@
 
                     <div
                             class="diff"
-                            v-if="newArea.image !== oldArea.image"
+                            v-if="showImageDiffSelector"
                     >
                         <ui-card
                                 outlined
                                 v-if="getAreaImageUrl(oldArea.image)"
                                 class="minus"
+                                :class="{
+                                    'selected': selectedImageIsOld,
+                                }"
                         >
                             <ui-card-content
                                     @click="loadAreaImageInto(oldArea, editedArea)"
@@ -202,7 +203,10 @@
                         <ui-card
                                 outlined
                                 v-if="getAreaImageUrl(newArea.image)"
-                                class="minus"
+                                class="plus"
+                                :class="{
+                                    'selected': selectedImageIsNew,
+                                }"
                         >
                             <ui-card-content
                                     @click="loadAreaImageInto(newArea, editedArea)"
@@ -323,8 +327,7 @@ export default defineComponent({
             return areaOverrideUpdateData(this.area);
         },
         areaImageUrl(): string {
-            return base64ImageToUrl(this.editedArea.image || this.areaVisible.image ||
-                    this.areaVisible.thumbnail);
+            return base64ImageToUrl(this.editedArea.image);
         },
         title(): string {
             if (this.editMode === EditMode.ADD) {
@@ -359,6 +362,31 @@ export default defineComponent({
                 lng: this.editedArea.locationPoint[1],
             };
         },
+        showNameDiffSelector(): boolean {
+            return !!this.newArea.name && this.newArea.name !== this.oldArea.name;
+        },
+        showCategoryDiffSelector(): boolean {
+            return this.newArea.category !== undefined && this.newArea.category !== this.oldArea.category;
+        },
+        showLocationDiffSelector(): boolean {
+            return !!this.newArea.location && this.newArea.location !== this.oldArea.location;
+        },
+        showLocationPointDiffSelector(): boolean {
+            return !!this.newArea.locationPoint && this.newArea.locationPoint[0] !== this.oldArea.locationPoint[0] &&
+                    this.newArea.locationPoint[1] !== this.oldArea.locationPoint[1];
+        },
+        showImageDiffSelector(): boolean {
+            return !!this.newArea.image && this.newArea.image !== this.oldArea.image;
+        },
+        selectedImageIsNew(): boolean {
+            return !!this.editedArea.image && this.editedArea.image === this.newArea.image;
+        },
+        selectedImageIsOld(): boolean {
+            return !!this.editedArea.image && this.editedArea.image === this.oldArea.image;
+        },
+        selectedImageIsNewOrOld(): boolean {
+            return this.selectedImageIsNew || this.selectedImageIsOld;
+        },
     },
     async mounted() {
         this.loadCategories();
@@ -367,13 +395,14 @@ export default defineComponent({
             await this.loadAreaFromId();
             this.loadAreaInto(this.areaVisible, this.editedArea);
             this.initialAreaName = this.areaVisible.name;
-            this.updatedAtTimestamp = this.areaVisible.updatedAtTimestamp;
+            this.updatedAtTimestamp = this.area.updatedAtTimestamp;
         } else if (this.editMode === EditMode.CONFLICT) {
             await this.loadAreaFromId();
             this.loadAreaInto(this.area, this.oldArea);
             if (this.area.savedUpdateData) {
                 this.loadAreaInto(this.area.savedUpdateData as AreaAddData, this.newArea);
             }
+            this.loadConflictEditedData();
             this.initialAreaName = this.area.name;
             this.updatedAtTimestamp = this.area.updatedAtTimestamp;
         }
@@ -428,6 +457,27 @@ export default defineComponent({
             target.locationPoint = source.locationPoint;
             target.image = source.image;
         },
+        loadConflictEditedData() {
+            if (!this.showNameDiffSelector) {
+                this.editedArea.name = this.oldArea.name;
+            }
+
+            if (!this.showCategoryDiffSelector) {
+                this.editedArea.category = this.oldArea.category;
+            }
+
+            if (!this.showLocationDiffSelector) {
+                this.editedArea.location = this.oldArea.location;
+            }
+
+            if (!this.showLocationPointDiffSelector) {
+                this.editedArea.locationPoint = this.oldArea.locationPoint;
+            }
+
+            if (!this.showImageDiffSelector) {
+                this.editedArea.image = this.oldArea.image;
+            }
+        },
         async loadAreaFromId(): Promise<void> {
             if (!this.areaId) {
                 return;
@@ -459,7 +509,8 @@ export default defineComponent({
                 areaUpdateData.location = this.editedArea.location;
             }
 
-            if (this.areaVisible.locationPoint !== this.editedArea.locationPoint) {
+            if (this.areaVisible.locationPoint[0] !== this.editedArea.locationPoint[0] &&
+                this.areaVisible.locationPoint[1] !== this.editedArea.locationPoint[1]) {
                 areaUpdateData.locationPoint = this.editedArea.locationPoint;
             }
 
@@ -472,7 +523,9 @@ export default defineComponent({
             this.errorHTML = '';
 
             try {
-                await areaService.updateArea(this.areaId, areaUpdateData);
+                const clearConflict = this.editMode === EditMode.CONFLICT;
+                await areaService.updateArea(this.areaId, areaUpdateData, undefined,
+                    undefined, clearConflict, true);
             } catch (err) {
                 this.errorHTML = multiErrorToHTMLString(err);
                 return;
@@ -498,7 +551,7 @@ export default defineComponent({
             await this.redirectToAreaDetails(area.id);
         },
         async onSaveButtonClick(): Promise<void> {
-            if (this.areaId) {
+            if (this.editMode === EditMode.UPDATE || this.editMode === EditMode.CONFLICT) {
                 await this.onSaveUpdateButtonClick();
             } else {
                 await this.onSaveAddButtonClick();
@@ -574,13 +627,46 @@ export default defineComponent({
     margin-right: 16px;
 }
 
-.minus {
+.diff {
+    margin: -8px 0 32px;
+}
+
+.minus,
+.plus {
+    margin: 15px 7px;
+    padding: 16px;
     border-radius: 4px;
+
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.minus:hover,
+.plus:hover {
+    margin: 14px 6px;
+}
+
+.minus {
     border: 1px solid rgba(221, 44, 0, 0.5);
 }
 
+.minus:hover {
+    border: 2px solid rgba(221, 44, 0, 1);
+}
+
+.minus.selected {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 .plus {
-    border-radius: 4px;
     border: 1px solid rgba(100, 221, 23, 0.5);
+}
+
+.plus:hover {
+    border: 2px solid rgba(100, 221, 23, 1);
+}
+
+.plus.selected {
+    background: rgba(0, 0, 0, 0.5);
 }
 </style>

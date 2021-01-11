@@ -32,6 +32,9 @@
                     </div>
                     <div
                             class="flag-marker"
+                            :class="{
+                                'conflict': areaHasUpdateConflictFlag,
+                            }"
                             v-if="areaHasAnyOfflineFlag"
                     >
                         <ui-icon-button>
@@ -47,7 +50,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
-import Area, { areaHasAnyFlag, areaOverrideUpdateData } from '@/models/Area';
+import Area, { areaHasAnyFlag, areaHasUpdateConflictFlag, areaOverrideUpdateData } from '@/models/Area';
 import { base64ImageToUrl } from '@/utils/image';
 
 export default defineComponent({
@@ -63,10 +66,13 @@ export default defineComponent({
             return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            return base64ImageToUrl(this.area.savedUpdateData?.image || this.area.thumbnail || this.area.image);
+            return base64ImageToUrl(this.areaVisible.image);
         },
         areaHasAnyOfflineFlag(): boolean {
             return areaHasAnyFlag(this.areaVisible);
+        },
+        areaHasUpdateConflictFlag(): boolean {
+            return areaHasUpdateConflictFlag(this.areaVisible);
         },
         areaVisible(): Area {
             return areaOverrideUpdateData(this.area);
@@ -109,5 +115,9 @@ export default defineComponent({
     font-size: 24px;
 
     padding: 0;
+}
+
+.flag-marker.conflict {
+    color: #dd2c00;
 }
 </style>

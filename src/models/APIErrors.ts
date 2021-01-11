@@ -10,6 +10,10 @@ export enum APIErrorCode {
     AREA_IMAGE_INVALID = 'area-image-invalid',
 }
 
+export enum ValidationErrorFieldName {
+    UPDATED_AT_TIMESTAMP = 'updated_at_timestamp',
+}
+
 export enum APIErrorType {
     API_ERROR = 'api-error',
     VALIDATION_ERROR = 'validation-error',
@@ -25,12 +29,32 @@ export interface APIError {
 }
 
 export interface ValidationError extends APIError {
-    fieldName: string;
+    fieldName: ValidationErrorFieldName;
     validValues: any[];
 }
 
 export interface MultiError extends APIError {
     errors: APIError[];
+}
+
+export function isValidationErrorUpdatedAtInvalid(error: ValidationError): boolean {
+    return error.fieldName === ValidationErrorFieldName.UPDATED_AT_TIMESTAMP;
+}
+
+export function isErrorAreaUpdatedAtInvalid(error: APIError): boolean {
+    if (error.type === APIErrorType.VALIDATION_ERROR) {
+        return isValidationErrorUpdatedAtInvalid(error as ValidationError);
+    } else if (error.type === APIErrorType.MULTI_ERROR) {
+        const multiError = error as MultiError;
+
+        for (const error of multiError.errors) {
+            if (error.code === APIErrorCode.AREA_UPDATED_AT_TIMESTAMP_INVALID) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 export function apiErrorToHTMLString(error: APIError): string {
