@@ -43,7 +43,7 @@ const areaService = new AreaService(
     _userRepository,
 );
 
-async function createErrorToast(err: APIError) {
+async function logErrorMessage(err: APIError) {
     const messages = errorToHTMLString(err).split('<br>');
     for (const message of messages) {
         console.error(message);
@@ -100,7 +100,7 @@ notificationService.emitter.on(NotificationServiceEvent.CONNECTION, () => {
 
 userService.emitter.on(
     UserServiceEvent.USER_GET_LOGGED_IN_ERROR,
-    createErrorToast,
+    logErrorMessage,
 );
 userService.emitter.on(
     UserServiceEvent.USER_GET_LOGGED_IN_ERROR,
@@ -108,21 +108,21 @@ userService.emitter.on(
 );
 userService.emitter.on(UserServiceEvent.USER_LOGGED_IN, redirectToIndex);
 userService.emitter.on(UserServiceEvent.USER_LOGGED_OUT, redirectToLogin);
-userService.emitter.on(UserServiceEvent.USER_LOGIN_ERROR, createErrorToast);
-userService.emitter.on(UserServiceEvent.USER_LOGOUT_ERROR, createErrorToast);
+userService.emitter.on(UserServiceEvent.USER_LOGIN_ERROR, logErrorMessage);
+userService.emitter.on(UserServiceEvent.USER_LOGOUT_ERROR, logErrorMessage);
 
 areaService.emitter.on(
     AreaServiceEvent.AREA_GET_CATEGORIES_ERROR,
-    createErrorToast,
+    logErrorMessage,
 );
-areaService.emitter.on(AreaServiceEvent.AREA_GET_PAGE_ERROR, createErrorToast);
+areaService.emitter.on(AreaServiceEvent.AREA_GET_PAGE_ERROR, logErrorMessage);
 areaService.emitter.on(
     AreaServiceEvent.AREA_GET_DETAILS_ERROR,
-    createErrorToast,
+    logErrorMessage,
 );
-areaService.emitter.on(AreaServiceEvent.AREA_ADD_ERROR, createErrorToast);
-areaService.emitter.on(AreaServiceEvent.AREA_UPDATE_ERROR, createErrorToast);
-areaService.emitter.on(AreaServiceEvent.AREA_DELETE_ERROR, createErrorToast);
+areaService.emitter.on(AreaServiceEvent.AREA_ADD_ERROR, logErrorMessage);
+areaService.emitter.on(AreaServiceEvent.AREA_UPDATE_ERROR, logErrorMessage);
+areaService.emitter.on(AreaServiceEvent.AREA_DELETE_ERROR, logErrorMessage);
 
 _router.beforeEach(async (to, from, next) => {
     if (to.name === _RouteNames.LOGIN && _store.getters.loggedInUser) {
