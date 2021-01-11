@@ -10,7 +10,7 @@
                 >
                     <ui-card-media
                             class="media"
-                            v-if="area.hasImage"
+                            v-if="areaImageUrl"
                             square
                             :style="{
                                 backgroundImage: areaImageUrl,
@@ -21,7 +21,7 @@
                                 class="name"
                                 :class="$tt('headline5')"
                         >
-                            {{ area.name }}
+                            {{ areaVisible.name }}
                         </div>
                         <div
                                 class="category_text"
@@ -29,17 +29,14 @@
                         >
                             {{ areaCategoryText }}
                         </div>
-                        <div
-                                class="offline-marker"
-                                v-if="hasOfflineFlag(AreaOfflineFlags.ADDED
-                                        | AreaOfflineFlags.UPDATED
-                                        | AreaOfflineFlags.DELETED)
-                                "
-                        >
-                            <ui-icon-button>
-                                <i class="mdi mdi-sync-alert"></i>
-                            </ui-icon-button>
-                        </div>
+                    </div>
+                    <div
+                            class="offline-marker"
+                            v-if="areaHasAnyOfflineFlag"
+                    >
+                        <ui-icon-button>
+                            <i class="mdi mdi-sync-alert"></i>
+                        </ui-icon-button>
                     </div>
                 </ui-card-content>
             </ui-card>
@@ -50,8 +47,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
-import { AreaOfflineFlags } from '@/repositories/AreaRepository';
-import Area from '@/models/Area';
+import Area, { areaHasAnyOfflineFlag, areaBackgroundImage, areaOverrideUpdateData } from '@/models/Area';
 
 export default defineComponent({
     name: 'AreaItem',
@@ -61,26 +57,18 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
-        return {
-            AreaOfflineFlags,
-        };
-    },
     computed: {
         areaCategoryText(): string | undefined {
-            return areaService.getAreaCategoryText(this.area.category);
+            return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            if (!this.area.hasImage) {
-                return '';
-            }
-
-            return `url(data:image/png;base64,${this.area.thumbnail})`;
+            return areaBackgroundImage(this.areaVisible, true);
         },
-    },
-    methods: {
-        hasOfflineFlag(flag: number): boolean {
-            return areaService.hasAreaOfflineFlag(this.area, flag);
+        areaHasAnyOfflineFlag(): boolean {
+            return areaHasAnyOfflineFlag(this.areaVisible);
+        },
+        areaVisible(): Area {
+            return areaOverrideUpdateData(this.area);
         },
     },
 });
@@ -105,14 +93,13 @@ export default defineComponent({
 
 .text {
     padding: 16px;
+    word-break: break-all;
 }
 
 .offline-marker {
-    position: absolute;
-    right: 16px;
-    top: 16px;
-
     display: flex;
+
+    margin: 16px 16px auto auto;
 }
 
 .offline-marker .mdc-icon-button {

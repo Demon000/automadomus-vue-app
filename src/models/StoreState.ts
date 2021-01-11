@@ -1,9 +1,9 @@
-import { AreaCategoriesMap, AreasDetailsMap } from '@/models/Area';
+import { AreaCategoriesMap, IdPartialAreaMap } from '@/models/Area';
 import User from '@/models/User';
 
 export default interface StoreState {
     loggedInUser: User | undefined;
-    areasDetailsMap: AreasDetailsMap;
+    idAreaMap: IdPartialAreaMap;
     areaCategories: AreaCategoriesMap;
     accessToken: string | undefined;
     refreshToken: string | undefined;

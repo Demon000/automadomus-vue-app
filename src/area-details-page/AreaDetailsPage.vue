@@ -3,7 +3,7 @@
         <app-sidebar></app-sidebar>
         <app-navbar
                 has-nav-button
-                :title="area ? area.name : ''">
+                :title="area ? areaVisible.name : ''">
             <template #toolbar>
                 <ui-icon-button
                         @click="onEditButtonClick"
@@ -24,50 +24,43 @@
             >
                 <template
                         #default
-                        v-if="area"
+                        v-if="areaVisible"
                 >
                     <ui-card-media
                             class="media"
-                            v-if="area.hasImage"
+                            v-if="areaImageUrl"
                             :style="{
-                            backgroundImage: areaImageUrl,
-                        }"
+                                backgroundImage: areaImageUrl,
+                            }"
                     ></ui-card-media>
                     <div class="content">
                         <div
                                 class="property"
-                                v-if="area.id"
+                                v-if="areaVisible.id"
                         >
                             <div class="type">Id</div>
-                            <div class="value">{{ area.id }}</div>
+                            <div class="value">{{ areaVisible.id }}</div>
                         </div>
                         <div
                                 class="property"
-                                v-if="area.owner"
+                                v-if="areaVisible.owner"
                         >
                             <div class="type">Owner</div>
-                            <div class="value">{{ area.owner.firstName }} {{ area.owner.lastName }}</div>
+                            <div class="value">{{ areaVisible.owner.firstName }} {{ areaVisible.owner.lastName }}</div>
                         </div>
                         <div
                                 class="property"
-                                v-if="area.hasImage !== undefined"
-                        >
-                            <div class="type">Has image</div>
-                            <div class="value">{{ area.hasImage }}</div>
-                        </div>
-                        <div
-                                class="property"
-                                v-if="area.location"
+                                v-if="areaVisible.location"
                         >
                             <div class="type">Location</div>
-                            <div class="value">{{ area.location }}</div>
+                            <div class="value">{{ areaVisible.location }}</div>
                         </div>
                         <div
                                 class="property"
-                                v-if="area.locationPoint"
+                                v-if="areaVisible.locationPoint"
                         >
                             <div class="type">Location point</div>
-                            <div class="value">{{ area.locationPoint[0] }}, {{ area.locationPoint[1] }}</div>
+                            <div class="value">{{ areaVisible.locationPoint[0] }}, {{ areaVisible.locationPoint[1] }}</div>
                         </div>
                         <div
                                 class="property"
@@ -78,32 +71,32 @@
                         </div>
                         <div
                                 class="property"
-                                v-if="area.noDevices !== undefined"
+                                v-if="areaVisible.noDevices !== undefined"
                         >
                             <div class="type">Number of devices</div>
-                            <div class="value">{{ area.noDevices }}</div>
+                            <div class="value">{{ areaVisible.noDevices }}</div>
                         </div>
                         <div
                                 class="property"
-                                v-if="area.noDevices !== undefined"
+                                v-if="areaVisible.noDevices !== undefined"
                         >
                             <div class="type">Number of controllers</div>
-                            <div class="value">{{ area.noControllers }}</div>
+                            <div class="value">{{ areaVisible.noControllers }}</div>
                         </div>
 
                         <div class="property">
                             <div class="type">Added offline</div>
-                            <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.ADDED) }}</div>
+                            <div class="value">{{ areaHasOfflineAddedFlag }}</div>
                         </div>
 
                         <div class="property">
                             <div class="type">Updated offline</div>
-                            <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.UPDATED) }}</div>
+                            <div class="value">{{ areaHasOfflineUpdatedFlag }}</div>
                         </div>
 
                         <div class="property">
                             <div class="type">Deleted offline</div>
-                            <div class="value">{{ hasOfflineFlag(AreaOfflineFlags.DELETED) }}</div>
+                            <div class="value">{{ areaHasOfflineDeletedFlag }}</div>
                         </div>
                     </div>
                 </template>
@@ -117,8 +110,12 @@ import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
 import { areaService, RouteNames } from '@/dependencies';
-import Area from '@/models/Area';
-import { AreaOfflineFlags } from '@/repositories/AreaRepository';
+import Area, {
+    areaHasOfflineAddedFlag,
+    areaHasOfflineDeletedFlag,
+    areaHasOfflineUpdatedFlag,
+    areaBackgroundImage, areaOverrideUpdateData,
+} from '@/models/Area';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
@@ -139,28 +136,34 @@ export default defineComponent({
     data() {
         return {
             area: undefined as Area | undefined,
-            AreaOfflineFlags,
         };
     },
     computed: {
+        areaVisible(): Area | undefined {
+            if (!this.area) {
+                return undefined;
+            }
+
+            return areaOverrideUpdateData(this.area);
+        },
         areaCategoryText(): string | undefined {
-            if (this.area === undefined) {
+            if (this.areaVisible === undefined) {
                 return;
             }
 
-            return areaService.getAreaCategoryText(this.area.category);
+            return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            if (!this.area || !this.area.hasImage) {
-                return '';
-            }
-
-            const image = this.area.image || this.area.thumbnail;
-            if (!image) {
-                return '';
-            }
-
-            return `url(data:image/png;base64,${image})`;
+            return areaBackgroundImage(this.areaVisible);
+        },
+        areaHasOfflineAddedFlag(): boolean {
+            return areaHasOfflineAddedFlag(this.areaVisible);
+        },
+        areaHasOfflineUpdatedFlag(): boolean {
+            return areaHasOfflineUpdatedFlag(this.areaVisible);
+        },
+        areaHasOfflineDeletedFlag(): boolean {
+            return areaHasOfflineDeletedFlag(this.areaVisible);
         },
     },
     mounted() {
@@ -172,7 +175,7 @@ export default defineComponent({
                 return;
             }
 
-            this.area = await areaService.getAreaDetails(this.areaId);
+            this.area = await areaService.getArea(this.areaId);
         },
         async onEditButtonClick() {
             if (!this.area) {
@@ -201,9 +204,6 @@ export default defineComponent({
             await this.$router.push({
                 name: RouteNames.AREAS,
             });
-        },
-        hasOfflineFlag(flag: number): boolean {
-            return areaService.hasAreaOfflineFlag(this.area, flag);
         },
     },
 });

@@ -7,9 +7,8 @@ import User from '@/models/User';
 
 export enum _StoreMutations {
     SET_LOGGED_IN_USER = 'setLoggedInUser',
-    SET_AREA_DETAILS = 'setAreaDetails',
-    CLEAR_AREAS_DETAILS_MAP = 'clearAreasDetailsMap',
-    DELETE_AREA_DETAILS = 'deleteAreaDetails',
+    SET_AREA = 'setAreaDetails',
+    DELETE_AREA = 'deleteAreaDetails',
     SET_AREA_CATEGORIES = 'setAreaCategories',
     SET_ACCESS_TOKEN = 'setAccessToken',
     SET_REFRESH_TOKEN = 'setRefreshToken',
@@ -20,7 +19,7 @@ export default createStore({
     state: {
         loggedInUser: undefined,
         areaCategories: {},
-        areasDetailsMap: {},
+        idAreaMap: {},
         accessToken: undefined,
         refreshToken: undefined,
     } as StoreState,
@@ -43,19 +42,16 @@ export default createStore({
         ) {
             state.refreshToken = token;
         },
-        [_StoreMutations.SET_AREA_DETAILS](state: StoreState, area: Area) {
-            if (!(area.id in state.areasDetailsMap)) {
-                state.areasDetailsMap[area.id] = area;
+        [_StoreMutations.SET_AREA](state: StoreState, { id, area }: { id: string, area: Partial<Area>}) {
+            if (!state.idAreaMap[id]) {
+                state.idAreaMap[id] = area;
                 return;
             }
 
-            Object.assign(state.areasDetailsMap[area.id], area);
+            Object.assign(state.idAreaMap[id], area);
         },
-        [_StoreMutations.CLEAR_AREAS_DETAILS_MAP](state: StoreState) {
-            state.areasDetailsMap = {};
-        },
-        [_StoreMutations.DELETE_AREA_DETAILS](state: StoreState, id: string) {
-            delete state.areasDetailsMap[id];
+        [_StoreMutations.DELETE_AREA](state: StoreState, id: string) {
+            delete state.idAreaMap[id];
         },
         [_StoreMutations.SET_AREA_CATEGORIES](
             state: StoreState,
@@ -74,8 +70,8 @@ export default createStore({
         refreshToken(state: StoreState): string | undefined {
             return state.refreshToken;
         },
-        areas(state: StoreState): Area[] {
-            return Object.values(state.areasDetailsMap);
+        areas(state: StoreState): Partial<Area>[] {
+            return Object.values(state.idAreaMap);
         },
         areaCategories(state: StoreState): AreaCategoriesMap {
             return state.areaCategories;
@@ -83,8 +79,8 @@ export default createStore({
         getAreaCategoryText: (state: StoreState) => (value: number): string => {
             return state.areaCategories[value];
         },
-        getAreaDetails: (state: StoreState) => (id: string): Area | undefined => {
-            return state.areasDetailsMap[id];
+        getAreaDetails: (state: StoreState) => (id: string): Partial<Area> | undefined => {
+            return state.idAreaMap[id];
         },
     },
 });

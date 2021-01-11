@@ -6,7 +6,7 @@
         <app-sidebar></app-sidebar>
         <app-navbar
                 has-nav-button
-                :title="areaTitle"
+                :title="title"
         >
             <template #toolbar>
                 <ui-icon-button
@@ -113,7 +113,13 @@ import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
 import { areaService, RouteNames } from '@/dependencies';
-import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption, AreaUpdateData } from '@/models/Area';
+import Area, {
+    AreaAddData,
+    AreaCategoriesMap,
+    AreaCategorySelectOption,
+    areaOverrideUpdateData,
+    AreaUpdateData,
+} from '@/models/Area';
 import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
 import Location, { LocationPoint } from '@/models/Location';
 
@@ -155,7 +161,7 @@ export default defineComponent({
                 image: '',
             } as AreaAddData,
             updatedAtTimestamp: 0,
-            areaTitle: '',
+            initialAreaName: '',
             imageName: '',
             errorHTML: '',
             PageMode,
@@ -170,11 +176,14 @@ export default defineComponent({
         isUpdateMode(): boolean {
             return !!this.areaId;
         },
+        areaVisible(): Area {
+            return areaOverrideUpdateData(this.area);
+        },
         title(): string {
             if (this.isAddMode) {
                 return 'Add area';
-            } else if (this.isUpdateMode && this.area) {
-                return `Update area ${this.area.name}`;
+            } else if (this.isUpdateMode && this.areaVisible) {
+                return `Update area ${this.initialAreaName}`;
             }
 
             return '';
@@ -223,18 +232,18 @@ export default defineComponent({
                 return;
             }
 
-            const area = await areaService.getAreaDetails(this.areaId);
+            const area = await areaService.getArea(this.areaId);
             if (!area) {
                 return;
             }
 
             this.area = area;
-            this.areaTitle = area.name;
-            this.updatedAtTimestamp = area.updatedAtTimestamp;
-            this.editedArea.name = area.name;
-            this.editedArea.category = area.category;
-            this.editedArea.location = area.location;
-            this.editedArea.locationPoint = area.locationPoint;
+            this.initialAreaName = this.areaVisible.name;
+            this.updatedAtTimestamp = this.areaVisible.updatedAtTimestamp;
+            this.editedArea.name = this.areaVisible.name;
+            this.editedArea.category = this.areaVisible.category;
+            this.editedArea.location = this.areaVisible.location;
+            this.editedArea.locationPoint = this.areaVisible.locationPoint;
         },
         async onSaveUpdateButtonClick(): Promise<void> {
             if (!this.areaId) {
@@ -243,23 +252,23 @@ export default defineComponent({
 
             const areaUpdateData: AreaUpdateData = {};
 
-            if (this.area.name !== this.editedArea.name) {
+            if (this.areaVisible.name !== this.editedArea.name) {
                 areaUpdateData.name = this.editedArea.name;
             }
 
-            if (this.area.category !== this.editedArea.category) {
+            if (this.areaVisible.category !== this.editedArea.category) {
                 areaUpdateData.category = this.editedArea.category;
             }
 
-            if (this.area.location !== this.editedArea.location) {
+            if (this.areaVisible.location !== this.editedArea.location) {
                 areaUpdateData.location = this.editedArea.location;
             }
 
-            if (this.area.locationPoint !== this.editedArea.locationPoint) {
+            if (this.areaVisible.locationPoint !== this.editedArea.locationPoint) {
                 areaUpdateData.locationPoint = this.editedArea.locationPoint;
             }
 
-            if (this.area.image !== this.editedArea.image && this.editedArea.image) {
+            if (this.areaVisible.image !== this.editedArea.image && this.editedArea.image) {
                 areaUpdateData.image = this.editedArea.image;
             }
 

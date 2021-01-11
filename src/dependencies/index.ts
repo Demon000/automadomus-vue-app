@@ -90,7 +90,7 @@ networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, async () =>
 });
 
 notificationService.emitter.on(NotificationServiceEvent.AREA_UPDATED, async (area) => {
-    await areaService.setAreaDetails(area);
+    await areaService.setArea(area);
 });
 
 notificationService.emitter.on(NotificationServiceEvent.CONNECTION, () => {

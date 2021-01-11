@@ -1,14 +1,12 @@
 import { Store } from 'vuex';
 import StoreState from '@/models/StoreState';
-import Area, { AreaCategoriesMap, AreaUpdateData } from '@/models/Area';
+import Area, {
+    AreaCategoriesMap,
+    AreaUpdateData,
+    areaHasAnyOfflineFlag,
+    areaHasOfflineDeletedFlag,
+} from '@/models/Area';
 import { StoreMutations } from '@/dependencies';
-
-export enum AreaOfflineFlags {
-    ADDED = 1 << 0,
-    UPDATED = 1 << 1,
-    DELETED = 1 << 2,
-    CONFLICT = 1 << 3,
-}
 
 export default class AreaRepository {
     private store: Store<StoreState>;
@@ -17,14 +15,17 @@ export default class AreaRepository {
         this.store = store;
     }
 
+    getAreas(): Area[] {
+        return this.store.getters.areas;
+    }
+
     getAreasPaginated(page = 0, limit = 0, filterDeleted = true, searchText = ''): Area[] {
-        let areas = this.store.getters.areas;
+        let areas = this.getAreas();
 
         if (filterDeleted) {
-            areas = areas.filter((area: Area) => {
-                const offlineFlags = area.offlineFlags || 0;
-                return !(offlineFlags & AreaOfflineFlags.DELETED);
-            });
+            areas = areas.filter((area: Area) =>
+                !areaHasOfflineDeletedFlag(area),
+            );
         }
 
         if (searchText) {
@@ -48,66 +49,75 @@ export default class AreaRepository {
             });
     }
 
-    clearAreasDetailsMap(): void {
-        this.store.commit(StoreMutations.CLEAR_AREAS_DETAILS_MAP);
-    }
-
-    getAreaDetails(id: string): Area | undefined {
+    getArea(id: string): Area | undefined {
         return this.store.getters.getAreaDetails(id);
     }
 
-    setAreaDetails(area: Area): void {
-        this.store.commit(StoreMutations.SET_AREA_DETAILS, area);
-    }
-
-    addAreaOffline(area: Area): void {
-        if (!area.offlineFlags) {
-            area.offlineFlags = 0;
+    setArea(area: Partial<Area>, id?: string): void {
+        id = id || area.id;
+        if (!id) {
+            console.error('Trying to set area without an id', area);
+            return;
         }
-        area.offlineFlags |= AreaOfflineFlags.ADDED;
 
-        this.store.commit(StoreMutations.SET_AREA_DETAILS, area);
-    }
-
-    updateAreaDetailsOffline(id: string, data: AreaUpdateData): void {
-        if (!data.offlineFlags) {
-            data.offlineFlags = 0;
-        }
-        data.offlineFlags |= AreaOfflineFlags.UPDATED;
-
-        this.store.commit(StoreMutations.SET_AREA_DETAILS, {
+        this.store.commit(StoreMutations.SET_AREA, {
             id,
-            ...data,
+            area,
         });
     }
 
-    deleteAreaDetails(id: string): void {
-        return this.store.commit(StoreMutations.DELETE_AREA_DETAILS, id);
+    deleteArea(id: string): void {
+        return this.store.commit(StoreMutations.DELETE_AREA, id);
     }
 
-    deleteAreaDetailsOffline(id: string): void {
-        const area = this.getAreaDetails(id);
+    clearAreas(): void {
+        const areas = this.getAreas();
+
+        for (const area of areas) {
+            if (!areaHasAnyOfflineFlag(area)) {
+                this.deleteArea(area.id);
+            }
+        }
+    }
+
+    setAreaOfflineFlag(id: string, flag: number): void {
+        const area = this.getArea(id);
         if (!area) {
-            console.error(`Trying to delete non-existent area with id: ${id}?`);
+            console.error(`Trying to set offline flag ${flag} for a non-existent area with id ${id}`);
             return;
         }
 
-        if (!area.offlineFlags) {
-            area.offlineFlags = 0;
-        }
-        area.offlineFlags |= AreaOfflineFlags.DELETED;
-        this.setAreaDetails(area);
+        const offlineFlags = (area.offlineFlags || 0) | flag;
+        this.setArea({
+            offlineFlags,
+        }, id);
     }
 
-    clearAreaDetailsOfflineFlags(id: string): void {
-        const area = this.getAreaDetails(id);
+    clearAreaOfflineFlags(id: string): void {
+        this.setArea({
+            offlineFlags: undefined,
+        }, id);
+    }
+
+    setAreaOfflineUpdate(id: string, data: AreaUpdateData | undefined): void {
+        const area = this.getArea(id);
         if (!area) {
-            console.error(`Trying to clear offline flags for non-existent area with id: ${id}?`);
+            console.error(`Trying to set offline update data for a non-existent area with id ${id}`, data);
             return;
         }
 
-        area.offlineFlags = 0;
-        this.setAreaDetails(area);
+        const offlineUpdateData = area.offlineUpdateData || {};
+        Object.assign(offlineUpdateData, data);
+
+        this.setArea({
+            offlineUpdateData,
+        }, id);
+    }
+
+    clearAreaOfflineUpdate(id: string): void {
+        this.setArea({
+            offlineUpdateData: undefined,
+        }, id);
     }
 
     setAreaCategories(categories: AreaCategoriesMap): void {
