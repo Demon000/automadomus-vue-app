@@ -119,7 +119,7 @@ export default class AreaService {
         this.emitter.emit(AreaServiceEvent.AREA_UPDATED, area);
     }
 
-    async addArea(data: AreaAddData, handleNetworkError = true, emitEvent = true): Promise<boolean> {
+    async addArea(data: AreaAddData, handleNetworkError = true, emitEvent = true): Promise<Area | undefined> {
         let areaResponse;
 
         try {
@@ -128,11 +128,11 @@ export default class AreaService {
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_ADD_ERROR, err);
-                return false;
+                throw err;
             }
 
             if (!handleNetworkError) {
-                return false;
+                throw err;
             }
 
             areaResponse = {
@@ -153,22 +153,22 @@ export default class AreaService {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
 
-        return true;
+        return area;
     }
 
     async updateArea(id: string, data: AreaUpdateData, handleNetworkError = true,
-        emitEvent = true): Promise<boolean> {
+        emitEvent = true): Promise<void> {
         try {
             const areaResponse = await this.areasAPI.areasPatchArea(id, data);
             this.areaRepository.setAreaDetails(areaResponse);
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_UPDATE_ERROR, err);
-                return false;
+                throw err;
             }
 
             if (!handleNetworkError) {
-                return false;
+                throw err;
             }
 
             this.areaRepository.updateAreaDetailsOffline(id, data);
@@ -183,8 +183,6 @@ export default class AreaService {
         if (emitEvent && area && area.offlineFlags) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
-
-        return true;
     }
 
     hasAreaOfflineFlag(area: Area | undefined, flag: number): boolean {
@@ -196,7 +194,7 @@ export default class AreaService {
         return !!area && this.hasAreaOfflineFlag(area, AreaOfflineFlags.ADDED);
     }
 
-    async deleteArea(id: string, handleNetworkError = true, emitEvent = true): Promise<boolean> {
+    async deleteArea(id: string, handleNetworkError = true, emitEvent = true): Promise<void> {
         let offlineModifications = false;
 
         try {
@@ -208,11 +206,11 @@ export default class AreaService {
         } catch (err) {
             if (!isNetworkError(err)) {
                 this.emitter.emit(AreaServiceEvent.AREA_DELETE_ERROR, err);
-                return false;
+                throw err;
             }
 
             if (!handleNetworkError) {
-                return false;
+                throw err;
             }
 
             this.areaRepository.deleteAreaDetailsOffline(id);
@@ -226,8 +224,6 @@ export default class AreaService {
         if (emitEvent && offlineModifications) {
             this.emitter.emit(AreaServiceEvent.OFFLINE_MODIFICATIONS);
         }
-
-        return true;
     }
 
     async syncAreaOfflineChanges(area: Area): Promise<void> {
@@ -236,13 +232,18 @@ export default class AreaService {
         const isUpdated = this.hasAreaOfflineFlag(area, AreaOfflineFlags.UPDATED);
         let success = false;
 
-        if (isDeleted) {
-            success = await this.deleteArea(area.id, false, true);
-        } else if (isAdded) {
-            success = await this.addArea(area, false, false);
-        } else if (isUpdated) {
-            success = await this.updateArea(area.id, area, false, false);
-        }
+        try {
+            if (isDeleted) {
+                await this.deleteArea(area.id, false, true);
+                success = true;
+            } else if (isAdded) {
+                await this.addArea(area, false, false);
+                success = true;
+            } else if (isUpdated) {
+                await this.updateArea(area.id, area, false, false);
+            }
+            success = true;
+        } catch (err) {}
 
         if (!success) {
             return;

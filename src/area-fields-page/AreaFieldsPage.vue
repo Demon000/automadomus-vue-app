@@ -94,6 +94,8 @@
                             </ui-textfield-icon>
                         </template>
                     </ui-textfield>
+
+                    <div class="errors" v-html="errorHTML"></div>
                 </div>
             </ui-card>
         </div>
@@ -110,12 +112,14 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-import { areaService } from '@/dependencies';
+import { areaService, RouteNames } from '@/dependencies';
 import Area, { AreaAddData, AreaCategoriesMap, AreaCategorySelectOption, AreaUpdateData } from '@/models/Area';
 import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
 import Location, { LocationPoint } from '@/models/Location';
 
 import { Plugins, CameraResultType } from '@capacitor/core';
+
+import { multiErrorToHTMLString } from '@/models/APIErrors';
 const { Camera } = Plugins;
 
 enum PageMode {
@@ -150,7 +154,10 @@ export default defineComponent({
                 locationPoint: [0.0, 0.0],
                 image: '',
             } as AreaAddData,
+            updatedAtTimestamp: 0,
+            areaTitle: '',
             imageName: '',
+            errorHTML: '',
             PageMode,
             mode: PageMode.FIELDS,
             categories: {} as AreaCategoriesMap,
@@ -195,15 +202,10 @@ export default defineComponent({
             };
         },
     },
-    watch: {
-        areaId() {
-            this.reloadArea();
-        },
-    },
     mounted() {
         this.loadCategories();
 
-        if (this.areaId) {
+        if (this.isUpdateMode) {
             this.reloadArea();
         }
     },
@@ -227,6 +229,8 @@ export default defineComponent({
             }
 
             this.area = area;
+            this.areaTitle = area.name;
+            this.updatedAtTimestamp = area.updatedAtTimestamp;
             this.editedArea.name = area.name;
             this.editedArea.category = area.category;
             this.editedArea.location = area.location;
@@ -259,10 +263,35 @@ export default defineComponent({
                 areaUpdateData.image = this.editedArea.image;
             }
 
-            await areaService.updateArea(this.areaId, areaUpdateData);
+            areaUpdateData.updatedAtTimestamp = this.updatedAtTimestamp;
+
+            this.errorHTML = '';
+
+            try {
+                await areaService.updateArea(this.areaId, areaUpdateData);
+            } catch (err) {
+                this.errorHTML = multiErrorToHTMLString(err);
+                return;
+            }
+
+            await this.redirectToAreaDetails(this.areaId);
         },
         async onSaveAddButtonClick(): Promise<void> {
-            await areaService.addArea(this.editedArea);
+            let area;
+            this.errorHTML = '';
+
+            try {
+                area = await areaService.addArea(this.editedArea);
+            } catch (err) {
+                this.errorHTML = multiErrorToHTMLString(err);
+                return;
+            }
+
+            if (!area) {
+                return;
+            }
+
+            await this.redirectToAreaDetails(area.id);
         },
         async onSaveButtonClick(): Promise<void> {
             if (this.areaId) {
@@ -281,6 +310,14 @@ export default defineComponent({
         },
         onOpenMapButtonClick(): void {
             this.mode = PageMode.LOCATION;
+        },
+        async redirectToAreaDetails(id: string): Promise<void> {
+            await this.$router.replace({
+                name: RouteNames.AREA_DETAILS,
+                params: {
+                    areaId: id,
+                },
+            });
         },
         async onOpenCameraButtonClick() {
             const image = await Camera.getPhoto({

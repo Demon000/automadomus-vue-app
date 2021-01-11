@@ -51,6 +51,7 @@ export default class AreasAPI {
             location: data.location,
             locationPoint: data.locationPoint,
             image: data.image,
+            updatedAtTimestamp: data.updatedAtTimestamp,
         });
         return response.data as Area;
     }

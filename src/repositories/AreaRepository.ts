@@ -7,6 +7,7 @@ export enum AreaOfflineFlags {
     ADDED = 1 << 0,
     UPDATED = 1 << 1,
     DELETED = 1 << 2,
+    CONFLICT = 1 << 3,
 }
 
 export default class AreaRepository {

@@ -11,13 +11,12 @@ import UserService, { UserServiceEvent } from '@/services/UserService';
 import AreasAPI from '@/api/AreasAPI';
 import AreaRepository from '@/repositories/AreaRepository';
 import AreaService, { AreaServiceEvent } from '@/services/AreaService';
-import Area from '@/models/Area';
 import NetworkTrackingService, { NetworkTrackerEvent } from '@/services/NetworkTrackingService';
-import { AxiosError } from 'axios';
 import PingAPI from '@/api/PingAPI';
 import GeocodeAPI from '@/api/GeocodeAPI';
 import GeocodeService from '@/services/GeocodeService';
 import NotificationService, { NotificationServiceEvents } from '@/services/NotificationService';
+import { APIError, errorToHTMLString } from '@/models/APIErrors';
 
 const _api = new API(CONFIG_API_BASE_URL);
 
@@ -44,15 +43,11 @@ const areaService = new AreaService(
     _userRepository,
 );
 
-async function createErrorToast(err: Error) {
-    let message = `${err.message}<br>`;
-    const response = (err as AxiosError).response;
-
-    if (response && response.data.error && response.data.message) {
-        message += response.data.message;
+async function createErrorToast(err: APIError) {
+    const messages = errorToHTMLString(err).split('<br>');
+    for (const message of messages) {
+        console.error(message);
     }
-
-    console.error(message);
 }
 
 async function redirectToLogin() {
@@ -64,15 +59,6 @@ async function redirectToLogin() {
 async function redirectToIndex() {
     await _router.replace({
         name: _RouteNames.INDEX,
-    });
-}
-
-async function redirectToAreaDetails(id: string) {
-    await _router.replace({
-        name: _RouteNames.AREA_DETAILS,
-        params: {
-            areaId: id,
-        },
     });
 }
 
@@ -124,25 +110,6 @@ userService.emitter.on(UserServiceEvent.USER_LOGGED_IN, redirectToIndex);
 userService.emitter.on(UserServiceEvent.USER_LOGGED_OUT, redirectToLogin);
 userService.emitter.on(UserServiceEvent.USER_LOGIN_ERROR, createErrorToast);
 userService.emitter.on(UserServiceEvent.USER_LOGOUT_ERROR, createErrorToast);
-
-areaService.emitter.on(AreaServiceEvent.AREA_UPDATED, async (area: Area) => {
-    const loadedAreaId = _router.currentRoute.value.params.areaId;
-    const routeName = _router.currentRoute.value.name;
-    if (routeName !== _RouteNames.AREA_EDIT || area.id !== loadedAreaId) {
-        return;
-    }
-
-    await redirectToAreaDetails(area.id);
-});
-
-areaService.emitter.on(AreaServiceEvent.AREA_ADDED, async (area: Area) => {
-    const routeName = _router.currentRoute.value.name;
-    if (routeName !== _RouteNames.AREA_ADD) {
-        return;
-    }
-
-    await redirectToAreaDetails(area.id);
-});
 
 areaService.emitter.on(
     AreaServiceEvent.AREA_GET_CATEGORIES_ERROR,

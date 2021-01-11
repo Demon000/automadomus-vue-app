@@ -190,7 +190,12 @@ export default defineComponent({
                 return;
             }
 
-            await areaService.deleteArea(this.area.id);
+            try {
+                await areaService.deleteArea(this.area.id);
+            } catch (err) {
+                console.error(err);
+                return;
+            }
 
             await this.$router.push({
                 name: RouteNames.AREAS,

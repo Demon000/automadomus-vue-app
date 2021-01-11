@@ -11,6 +11,7 @@ export interface AreaAddData {
 
 export type AreaUpdateData = Partial<AreaAddData> & {
     offlineFlags?: number;
+    updatedAtTimestamp?: number;
 };
 
 export default interface Area {
@@ -20,6 +21,8 @@ export default interface Area {
     category: number;
     location: string;
     locationPoint: [number, number];
+    createdAtTimestamp: number;
+    updatedAtTimestamp: number;
 
     image?: string;
     thumbnail?: string;
