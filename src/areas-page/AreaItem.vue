@@ -100,6 +100,7 @@ export default defineComponent({
 .media {
     width: 120px;
     height: 100%;
+    flex-shrink: 0;
 }
 
 .text {
