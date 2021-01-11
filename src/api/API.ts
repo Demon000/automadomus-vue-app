@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { isNetworkError, objectToSnake, objectToCamel } from '@/utils/misc';
 import EventEmitter from 'eventemitter3';
 
@@ -66,9 +66,13 @@ export default class API {
                 response.data = objectToCamel(response.data);
                 return response;
             },
-            (error: Error) => {
+            (error: AxiosError) => {
                 if (isNetworkError(error)) {
                     this.emitter.emit(APIEvents.NETWORK_ERROR, error);
+                }
+
+                if (error.response && error.response.data) {
+                    return Promise.reject(objectToCamel(error.response.data));
                 }
 
                 return Promise.reject(error);
