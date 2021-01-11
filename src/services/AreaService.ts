@@ -1,8 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import ObjectID from 'bson-objectid';
 
-import { isNetworkError } from '@/utils/misc';
-
 import Area, {
     AreaCategoriesMap,
     AreaAddData,
@@ -12,6 +10,7 @@ import Area, {
 import AreasAPI from '@/api/AreasAPI';
 import AreaRepository, { AreaOfflineFlags } from '@/repositories/AreaRepository';
 import UserRepository from '@/repositories/UserRepository';
+import { isNetworkError } from '@/utils/network';
 
 export enum AreaServiceEvent {
     AREA_GET_CATEGORIES_ERROR = 'area-get-categories-error',

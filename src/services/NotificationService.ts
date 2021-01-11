@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import EventEmitter from 'eventemitter3';
 import Area from '@/models/Area';
-import { objectToCamel } from '@/utils/misc';
+import { objectToCamel } from '@/utils/case';
 
 export enum NotificationServiceEvents {
     CONNECTION = 'connection',

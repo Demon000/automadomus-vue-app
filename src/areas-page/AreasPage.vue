@@ -113,14 +113,14 @@ import { CONFIG_AREAS_PAGINATED_LIMIT } from '@/config';
 
 import Area from '@/models/Area';
 
-import InfiniteScrollBottomDetector from '@/util-components/infinite-scroll/InfiniteScrollBottomDetector.vue';
+import InfiniteScrollBottomDetector from '@/util-components/InfiniteScrollBottomDetector.vue';
 
 import AppNavbar from '@/app/AppNavbar.vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AreaItem from '@/areas-page/AreaItem.vue';
 import { AreaServiceEvent } from '@/services/AreaService';
 import AppBanner from '@/app/AppBanner.vue';
-import HeightTransition from '@/util-components/height-transition/HeightTransition.vue';
+import HeightTransition from '@/util-components/HeightTransition.vue';
 import { NotificationServiceEvents } from '@/services/NotificationService';
 
 export default defineComponent({
