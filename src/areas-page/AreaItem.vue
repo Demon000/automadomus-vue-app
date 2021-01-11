@@ -47,7 +47,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
-import Area, { areaHasAnyOfflineFlag, areaBackgroundImage, areaOverrideUpdateData } from '@/models/Area';
+import Area, { areaHasAnyOfflineFlag, areaOverrideUpdateData } from '@/models/Area';
+import { base64ImageToUrl } from '@/utils/image';
 
 export default defineComponent({
     name: 'AreaItem',
@@ -62,7 +63,7 @@ export default defineComponent({
             return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            return areaBackgroundImage(this.areaVisible, true);
+            return base64ImageToUrl(this.areaVisible.thumbnail || this.areaVisible.image);
         },
         areaHasAnyOfflineFlag(): boolean {
             return areaHasAnyOfflineFlag(this.areaVisible);

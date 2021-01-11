@@ -81,22 +81,3 @@ export function areaOverrideUpdateData(area: Area): Area {
 
     return Object.assign({}, area, area.offlineUpdateData);
 }
-
-export function areaBackgroundImage(area: Area | undefined, thumbnailFirst = false): string {
-    if (!area) {
-        return '';
-    }
-
-    let image;
-    if (thumbnailFirst) {
-        image = area.thumbnail || area.image;
-    } else {
-        image = area.image || area.thumbnail;
-    }
-
-    if (!image) {
-        return '';
-    }
-
-    return `url(data:image/png;base64,${image})`;
-}

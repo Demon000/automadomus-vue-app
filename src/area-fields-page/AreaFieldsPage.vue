@@ -95,6 +95,18 @@
                         </template>
                     </ui-textfield>
 
+                    <ui-card
+                            outlined
+                            v-if="areaImageUrl"
+                    >
+                        <ui-card-media
+                                square
+                                :style="{
+                                    backgroundImage: areaImageUrl,
+                                }"
+                        ></ui-card-media>
+                    </ui-card>
+
                     <div class="errors" v-html="errorHTML"></div>
                 </div>
             </ui-card>
@@ -126,6 +138,7 @@ import Location, { LocationPoint } from '@/models/Location';
 import { Plugins, CameraResultType } from '@capacitor/core';
 
 import { multiErrorToHTMLString } from '@/models/APIErrors';
+import { base64ImageToUrl } from '@/utils/image';
 const { Camera } = Plugins;
 
 enum PageMode {
@@ -159,6 +172,7 @@ export default defineComponent({
                 location: '',
                 locationPoint: [0.0, 0.0],
                 image: '',
+                thumbnail: '',
             } as AreaAddData,
             updatedAtTimestamp: 0,
             initialAreaName: '',
@@ -178,6 +192,10 @@ export default defineComponent({
         },
         areaVisible(): Area {
             return areaOverrideUpdateData(this.area);
+        },
+        areaImageUrl(): string {
+            return base64ImageToUrl(this.editedArea.image || this.areaVisible.image ||
+                    this.areaVisible.thumbnail);
         },
         title(): string {
             if (this.isAddMode) {

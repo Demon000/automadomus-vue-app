@@ -114,8 +114,9 @@ import Area, {
     areaHasOfflineAddedFlag,
     areaHasOfflineDeletedFlag,
     areaHasOfflineUpdatedFlag,
-    areaBackgroundImage, areaOverrideUpdateData,
+    areaOverrideUpdateData,
 } from '@/models/Area';
+import { base64ImageToUrl } from '@/utils/image';
 
 export default defineComponent({
     name: 'AreaDetailsPage',
@@ -154,7 +155,11 @@ export default defineComponent({
             return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            return areaBackgroundImage(this.areaVisible);
+            if (!this.areaVisible) {
+                return '';
+            }
+
+            return base64ImageToUrl(this.areaVisible.image || this.areaVisible.thumbnail);
         },
         areaHasOfflineAddedFlag(): boolean {
             return areaHasOfflineAddedFlag(this.areaVisible);
