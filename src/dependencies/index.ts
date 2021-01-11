@@ -1,7 +1,7 @@
 import { CONFIG_API_BASE_URL, CONFIG_SOCKET_BASE_URL } from '@/config';
 
 import _store, { _StoreMutations } from '@/dependencies/_store';
-import _router, { _RouteNames } from '@/dependencies/_router';
+import _router, { _RouteNames, redirectToIndex, redirectToLogin } from '@/dependencies/_router';
 
 import API, { APIEvent } from '@/api/API';
 import UserAPI from '@/api/UserAPI';
@@ -48,18 +48,6 @@ async function logErrorMessage(err: APIError) {
     for (const message of messages) {
         console.error(message);
     }
-}
-
-async function redirectToLogin() {
-    await _router.replace({
-        name: _RouteNames.LOGIN,
-    });
-}
-
-async function redirectToIndex() {
-    await _router.replace({
-        name: _RouteNames.INDEX,
-    });
 }
 
 _api.emitter.on(APIEvent.NETWORK_ERROR, async () => {

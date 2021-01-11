@@ -11,6 +11,7 @@ export enum _RouteNames {
     AREA_DETAILS = 'area-details',
     AREA_EDIT = 'area-edit',
     AREA_ADD = 'area-add',
+    AREA_SOLVE_CONFLICT = 'area-solve-conflict',
 }
 
 const _router = createRouter({
@@ -54,11 +55,34 @@ const _router = createRouter({
             },
         },
         {
+            path: '/area-conflict/:areaId',
+            name: _RouteNames.AREA_SOLVE_CONFLICT,
+            component: AreaFieldsPage,
+            props: route => {
+                return {
+                    areaId: route.params.areaId,
+                    conflict: true,
+                };
+            },
+        },
+        {
             path: '/area-add',
             name: _RouteNames.AREA_ADD,
             component: AreaFieldsPage,
         },
     ],
 });
+
+export async function redirectToLogin(): Promise<void> {
+    await _router.replace({
+        name: _RouteNames.LOGIN,
+    });
+}
+
+export async function redirectToIndex(): Promise<void> {
+    await _router.replace({
+        name: _RouteNames.INDEX,
+    });
+}
 
 export default _router;

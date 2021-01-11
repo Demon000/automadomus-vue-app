@@ -3,7 +3,7 @@ import StoreState from '@/models/StoreState';
 import Area, {
     AreaCategoriesMap,
     AreaUpdateData,
-    areaHasAnyOfflineFlag,
+    areaHasAnyFlag,
     areaHasOfflineDeletedFlag,
 } from '@/models/Area';
 import { StoreMutations } from '@/dependencies';
@@ -30,9 +30,13 @@ export default class AreaRepository {
 
         if (searchText) {
             const lowerSearchText = searchText.toLowerCase();
-            areas = areas.filter((area: Area) => {
-                return area.name.toLowerCase().includes(lowerSearchText);
-            });
+            areas = areas
+                .filter((area: Area) => {
+                    return area.name.toLowerCase().includes(lowerSearchText);
+                })
+                .sort((area: Area) => {
+                    return area.flags || 0;
+                });
         }
 
         return areas
@@ -42,10 +46,10 @@ export default class AreaRepository {
             .slice(page * limit, (page + 1) * limit);
     }
 
-    getOfflineChangedAreas(): Area[] {
+    getFlaggedAreas(): Area[] {
         return this.store.getters.areas
             .filter((area: Area) => {
-                return !!area.offlineFlags;
+                return areaHasAnyFlag(area);
             });
     }
 
@@ -74,28 +78,28 @@ export default class AreaRepository {
         const areas = this.getAreas();
 
         for (const area of areas) {
-            if (!areaHasAnyOfflineFlag(area)) {
+            if (!areaHasAnyFlag(area)) {
                 this.deleteArea(area.id);
             }
         }
     }
 
-    setAreaOfflineFlag(id: string, flag: number): void {
+    setAreaFlag(id: string, flag: number): void {
         const area = this.getArea(id);
         if (!area) {
             console.error(`Trying to set offline flag ${flag} for a non-existent area with id ${id}`);
             return;
         }
 
-        const offlineFlags = (area.offlineFlags || 0) | flag;
+        const flags = (area.flags || 0) | flag;
         this.setArea({
-            offlineFlags,
+            flags,
         }, id);
     }
 
-    clearAreaOfflineFlags(id: string): void {
+    clearAreaFlags(id: string): void {
         this.setArea({
-            offlineFlags: undefined,
+            flags: undefined,
         }, id);
     }
 
@@ -106,17 +110,17 @@ export default class AreaRepository {
             return;
         }
 
-        const offlineUpdateData = area.offlineUpdateData || {};
-        Object.assign(offlineUpdateData, data);
+        const savedUpdateData = area.savedUpdateData || {};
+        Object.assign(savedUpdateData, data);
 
         this.setArea({
-            offlineUpdateData,
+            savedUpdateData: savedUpdateData,
         }, id);
     }
 
     clearAreaOfflineUpdate(id: string): void {
         this.setArea({
-            offlineUpdateData: undefined,
+            savedUpdateData: undefined,
         }, id);
     }
 

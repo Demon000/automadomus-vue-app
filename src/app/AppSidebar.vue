@@ -8,8 +8,6 @@ import { defineComponent } from 'vue';
 
 import { RouteNames, userService } from '@/dependencies';
 
-import AppLogo from '@/app/AppLogo.vue';
-
 import User from '@/models/User';
 
 export default defineComponent({

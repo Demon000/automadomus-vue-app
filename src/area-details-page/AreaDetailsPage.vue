@@ -6,6 +6,12 @@
                 :title="area ? areaVisible.name : ''">
             <template #toolbar>
                 <ui-icon-button
+                        v-if="areaHasUpdateConflictFlag"
+                        @click="onSolveConflictsButtonClick"
+                >
+                    <i class="mdi mdi-call-merge"></i>
+                </ui-icon-button>
+                <ui-icon-button
                         @click="onEditButtonClick"
                 >
                     <i class="mdi mdi-pencil"></i>
@@ -114,6 +120,7 @@ import Area, {
     areaHasOfflineAddedFlag,
     areaHasOfflineDeletedFlag,
     areaHasOfflineUpdatedFlag,
+    areaHasUpdateConflictFlag,
     areaOverrideUpdateData,
 } from '@/models/Area';
 import { base64ImageToUrl } from '@/utils/image';
@@ -170,6 +177,9 @@ export default defineComponent({
         areaHasOfflineDeletedFlag(): boolean {
             return areaHasOfflineDeletedFlag(this.areaVisible);
         },
+        areaHasUpdateConflictFlag(): boolean {
+            return areaHasUpdateConflictFlag(this.areaVisible);
+        },
     },
     mounted() {
         this.reloadArea();
@@ -208,6 +218,18 @@ export default defineComponent({
 
             await this.$router.push({
                 name: RouteNames.AREAS,
+            });
+        },
+        async onSolveConflictsButtonClick() {
+            if (!this.area) {
+                return;
+            }
+
+            await this.$router.push({
+                name: RouteNames.AREA_SOLVE_CONFLICT,
+                params: {
+                    areaId: this.area.id,
+                },
             });
         },
     },

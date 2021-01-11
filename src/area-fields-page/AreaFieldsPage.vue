@@ -30,6 +30,23 @@
                     >
                         Name
                     </ui-textfield>
+                    <div
+                            class="diff"
+                            v-if="newArea.name !== oldArea.name"
+                    >
+                        <div
+                                class="minus"
+                                @click="loadAreaNameInto(oldArea, editedArea)"
+                        >
+                            {{ oldArea.name }}
+                        </div>
+                        <div
+                                class="plus"
+                                @click="loadAreaNameInto(newArea, editedArea)"
+                        >
+                            {{ newArea.name }}
+                        </div>
+                    </div>
 
                     <ui-select
                             class="ui-textfield"
@@ -40,6 +57,23 @@
                     >
                         Category
                     </ui-select>
+                    <div
+                            class="diff"
+                            v-if="newArea.category !== oldArea.category"
+                    >
+                        <div
+                                class="minus"
+                                @click="loadAreaCategoryInto(oldArea, editedArea)"
+                        >
+                            {{ getAreaCategoryText(oldArea.category) }}
+                        </div>
+                        <div
+                                class="plus"
+                                @click="loadAreaCategoryInto(newArea, editedArea)"
+                        >
+                            {{ getAreaCategoryText(newArea.category) }}
+                        </div>
+                    </div>
 
                     <ui-textfield
                             class="ui-textfield"
@@ -58,6 +92,23 @@
                             </ui-textfield-icon>
                         </template>
                     </ui-textfield>
+                    <div
+                            class="diff"
+                            v-if="newArea.location !== oldArea.location"
+                    >
+                        <div
+                                class="minus"
+                                @click="loadAreaLocationInto(oldArea, editedArea)"
+                        >
+                            {{ oldArea.location }}
+                        </div>
+                        <div
+                                class="plus"
+                                @click="loadAreaLocationInto(newArea, editedArea)"
+                        >
+                            {{ newArea.location }}
+                        </div>
+                    </div>
 
                     <div class="point-fields" v-if="editedArea.locationPoint">
                         <ui-textfield
@@ -74,6 +125,26 @@
                         >
                             Longitude
                         </ui-textfield>
+                        <div
+                                class="diff"
+                                v-if="
+                                    newArea.locationPoint[0] !== oldArea.locationPoint[0] ||
+                                    newArea.locationPoint[1] !== oldArea.locationPoint[1]
+                                "
+                        >
+                            <div
+                                    class="minus"
+                                    @click="loadAreaLocationPointInto(oldArea, editedArea)"
+                            >
+                                {{ oldArea.locationPoint[0] }}, {{ oldArea.locationPoint[1] }}
+                            </div>
+                            <div
+                                    class="plus"
+                                    @click="loadAreaLocationPointInto(newArea, editedArea)"
+                            >
+                                {{ newArea.locationPoint[0] }}, {{ newArea.locationPoint[1] }}
+                            </div>
+                        </div>
                     </div>
 
                     <ui-textfield
@@ -107,6 +178,45 @@
                         ></ui-card-media>
                     </ui-card>
 
+                    <div
+                            class="diff"
+                            v-if="newArea.image !== oldArea.image"
+                    >
+                        <ui-card
+                                outlined
+                                v-if="getAreaImageUrl(oldArea.image)"
+                                class="minus"
+                        >
+                            <ui-card-content
+                                    @click="loadAreaImageInto(oldArea, editedArea)"
+                            >
+                                <ui-card-media
+                                        square
+                                        :style="{
+                                            backgroundImage: getAreaImageUrl(oldArea.image),
+                                        }"
+                                ></ui-card-media>
+                            </ui-card-content>
+                        </ui-card>
+
+                        <ui-card
+                                outlined
+                                v-if="getAreaImageUrl(newArea.image)"
+                                class="minus"
+                        >
+                            <ui-card-content
+                                    @click="loadAreaImageInto(newArea, editedArea)"
+                            >
+                                <ui-card-media
+                                        square
+                                        :style="{
+                                            backgroundImage: getAreaImageUrl(newArea.image),
+                                        }"
+                                ></ui-card-media>
+                            </ui-card-content>
+                        </ui-card>
+                    </div>
+
                     <div class="errors" v-html="errorHTML"></div>
                 </div>
             </ui-card>
@@ -124,13 +234,14 @@
 import { defineComponent } from 'vue';
 import AppSidebar from '@/app/AppSidebar.vue';
 import AppNavbar from '@/app/AppNavbar.vue';
-import { areaService, RouteNames } from '@/dependencies';
+import { areaService, notificationService, RouteNames } from '@/dependencies';
 import Area, {
     AreaAddData,
     AreaCategoriesMap,
     AreaCategorySelectOption,
-    areaOverrideUpdateData,
     AreaUpdateData,
+    EmptyArea,
+    areaOverrideUpdateData,
 } from '@/models/Area';
 import AreaLocationSelectPage from '@/area-location-select-page/AreaLocationSelectPage.vue';
 import Location, { LocationPoint } from '@/models/Location';
@@ -139,7 +250,14 @@ import { Plugins, CameraResultType } from '@capacitor/core';
 
 import { multiErrorToHTMLString } from '@/models/APIErrors';
 import { base64ImageToUrl } from '@/utils/image';
+import { NotificationServiceEvent } from '@/services/NotificationService';
 const { Camera } = Plugins;
+
+enum EditMode {
+    ADD = 'add',
+    UPDATE = 'update',
+    CONFLICT = 'conflict',
+}
 
 enum PageMode {
     FIELDS = 'fields',
@@ -157,22 +275,24 @@ export default defineComponent({
         areaId: {
             type: String,
         },
+        conflict: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             area: {
-                name: '',
-                category: 0,
-                location: '',
-                locationPoint: [0.0, 0.0],
+                ...EmptyArea,
             } as Area,
+            oldArea: {
+                ...EmptyArea,
+            } as AreaAddData,
+            newArea: {
+                ...EmptyArea,
+            } as AreaAddData,
             editedArea: {
-                name: '',
-                category: 0,
-                location: '',
-                locationPoint: [0.0, 0.0],
-                image: '',
-                thumbnail: '',
+                ...EmptyArea,
             } as AreaAddData,
             updatedAtTimestamp: 0,
             initialAreaName: '',
@@ -184,13 +304,22 @@ export default defineComponent({
         };
     },
     computed: {
-        isAddMode(): boolean {
-            return !this.areaId;
-        },
-        isUpdateMode(): boolean {
-            return !!this.areaId;
+        editMode(): EditMode {
+            if (this.areaId) {
+                if (this.conflict) {
+                    return EditMode.CONFLICT;
+                } else {
+                    return EditMode.UPDATE;
+                }
+            } else {
+                return EditMode.ADD;
+            }
         },
         areaVisible(): Area {
+            if (this.editMode !== EditMode.UPDATE) {
+                return this.area;
+            }
+
             return areaOverrideUpdateData(this.area);
         },
         areaImageUrl(): string {
@@ -198,10 +327,12 @@ export default defineComponent({
                     this.areaVisible.thumbnail);
         },
         title(): string {
-            if (this.isAddMode) {
+            if (this.editMode === EditMode.ADD) {
                 return 'Add area';
-            } else if (this.isUpdateMode && this.areaVisible) {
+            } else if (this.editMode === EditMode.UPDATE) {
                 return `Update area ${this.initialAreaName}`;
+            } else if (this.editMode === EditMode.CONFLICT) {
+                return `Merge area ${this.initialAreaName}`;
             }
 
             return '';
@@ -219,7 +350,7 @@ export default defineComponent({
             return categoriesSelectOptions;
         },
         initialLocationPoint(): LocationPoint | undefined {
-            if (this.isAddMode) {
+            if (this.editMode === EditMode.ADD) {
                 return undefined;
             }
 
@@ -229,14 +360,43 @@ export default defineComponent({
             };
         },
     },
-    mounted() {
+    async mounted() {
         this.loadCategories();
 
-        if (this.isUpdateMode) {
-            this.reloadArea();
+        if (this.editMode === EditMode.UPDATE) {
+            await this.loadAreaFromId();
+            this.loadAreaInto(this.areaVisible, this.editedArea);
+            this.initialAreaName = this.areaVisible.name;
+            this.updatedAtTimestamp = this.areaVisible.updatedAtTimestamp;
+        } else if (this.editMode === EditMode.CONFLICT) {
+            await this.loadAreaFromId();
+            this.loadAreaInto(this.area, this.oldArea);
+            if (this.area.savedUpdateData) {
+                this.loadAreaInto(this.area.savedUpdateData as AreaAddData, this.newArea);
+            }
+            this.initialAreaName = this.area.name;
+            this.updatedAtTimestamp = this.area.updatedAtTimestamp;
         }
+
+        notificationService.emitter.on(NotificationServiceEvent.AREA_UPDATED, this.onAreaUpdated);
+    },
+    beforeUnmount() {
+        notificationService.emitter.off(NotificationServiceEvent.AREA_UPDATED, this.onAreaUpdated);
     },
     methods: {
+        getAreaCategoryText(category: number): string | undefined {
+            return areaService.getAreaCategoryText(category);
+        },
+        getAreaImageUrl(image: string): string {
+            return base64ImageToUrl(image);
+        },
+        async onAreaUpdated(area: Area) {
+            if (!this.areaId || this.areaId !== area.id) {
+                return;
+            }
+
+            await this.loadAreaFromId();
+        },
         async loadCategories() {
             const categories = await areaService.getAreaCategories();
             if (!categories) {
@@ -245,7 +405,30 @@ export default defineComponent({
 
             this.categories = categories;
         },
-        async reloadArea(): Promise<void> {
+        loadAreaNameInto(source: AreaAddData, target: AreaAddData): void {
+            target.name = source.name;
+        },
+        loadAreaCategoryInto(source: AreaAddData, target: AreaAddData): void {
+            target.category = source.category;
+        },
+        loadAreaLocationInto(source: AreaAddData, target: AreaAddData): void {
+            target.location = source.location;
+        },
+        loadAreaLocationPointInto(source: AreaAddData, target: AreaAddData): void {
+            target.locationPoint[0] = source.locationPoint[0];
+            target.locationPoint[1] = source.locationPoint[1];
+        },
+        loadAreaImageInto(source: AreaAddData, target: AreaAddData): void {
+            target.image = source.image;
+        },
+        loadAreaInto(source: AreaAddData, target: AreaAddData): void {
+            target.name = source.name;
+            target.category = source.category;
+            target.location = source.location;
+            target.locationPoint = source.locationPoint;
+            target.image = source.image;
+        },
+        async loadAreaFromId(): Promise<void> {
             if (!this.areaId) {
                 return;
             }
@@ -256,12 +439,6 @@ export default defineComponent({
             }
 
             this.area = area;
-            this.initialAreaName = this.areaVisible.name;
-            this.updatedAtTimestamp = this.areaVisible.updatedAtTimestamp;
-            this.editedArea.name = this.areaVisible.name;
-            this.editedArea.category = this.areaVisible.category;
-            this.editedArea.location = this.areaVisible.location;
-            this.editedArea.locationPoint = this.areaVisible.locationPoint;
         },
         async onSaveUpdateButtonClick(): Promise<void> {
             if (!this.areaId) {
@@ -395,5 +572,15 @@ export default defineComponent({
 
 .point-fields .ui-textfield:not(:last-child) {
     margin-right: 16px;
+}
+
+.minus {
+    border-radius: 4px;
+    border: 1px solid rgba(221, 44, 0, 0.5);
+}
+
+.plus {
+    border-radius: 4px;
+    border: 1px solid rgba(100, 221, 23, 0.5);
 }
 </style>

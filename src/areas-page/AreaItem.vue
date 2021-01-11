@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div
-                            class="offline-marker"
+                            class="flag-marker"
                             v-if="areaHasAnyOfflineFlag"
                     >
                         <ui-icon-button>
@@ -47,7 +47,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { areaService } from '@/dependencies';
-import Area, { areaHasAnyOfflineFlag, areaOverrideUpdateData } from '@/models/Area';
+import Area, { areaHasAnyFlag, areaOverrideUpdateData } from '@/models/Area';
 import { base64ImageToUrl } from '@/utils/image';
 
 export default defineComponent({
@@ -63,10 +63,10 @@ export default defineComponent({
             return areaService.getAreaCategoryText(this.areaVisible.category);
         },
         areaImageUrl(): string {
-            return base64ImageToUrl(this.areaVisible.thumbnail || this.areaVisible.image);
+            return base64ImageToUrl(this.area.savedUpdateData?.image || this.area.thumbnail || this.area.image);
         },
         areaHasAnyOfflineFlag(): boolean {
-            return areaHasAnyOfflineFlag(this.areaVisible);
+            return areaHasAnyFlag(this.areaVisible);
         },
         areaVisible(): Area {
             return areaOverrideUpdateData(this.area);
@@ -97,13 +97,13 @@ export default defineComponent({
     word-break: break-all;
 }
 
-.offline-marker {
+.flag-marker {
     display: flex;
 
     margin: 16px 16px auto auto;
 }
 
-.offline-marker .mdc-icon-button {
+.flag-marker .mdc-icon-button {
     width: 24px;
     height: 24px;
     font-size: 24px;
