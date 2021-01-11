@@ -29,7 +29,13 @@ export default class AreasAPI {
     }
 
     async areasPost(data: AreaAddData): Promise<Area> {
-        const response = await this.api.baseRequest.post('/areas', data);
+        const response = await this.api.baseRequest.post('/areas', {
+            name: data.name,
+            category: data.category,
+            location: data.location,
+            locationPoint: data.locationPoint,
+            image: data.image,
+        });
         return response.data as Area;
     }
 
@@ -39,7 +45,14 @@ export default class AreasAPI {
     }
 
     async areasPatchArea(id: string, data: AreaUpdateData): Promise<Area> {
-        const response = await this.api.baseRequest.patch(`/areas/${id}`, data);
+        const response = await this.api.baseRequest.patch(`/areas/${id}`, {
+            name: data.name,
+            category: data.category,
+            location: data.location,
+            locationPoint: data.locationPoint,
+            image: data.image,
+            updatedAtTimestamp: data.updatedAtTimestamp,
+        });
         return response.data as Area;
     }
 
