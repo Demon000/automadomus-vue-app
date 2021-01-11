@@ -38,14 +38,7 @@ export default class UserService {
         this.emitter.emit(UserServiceEvent.USER_LOGGED_IN, user);
     }
 
-    async logoutUser(): Promise<void> {
-        try {
-            await this.userApi.postUserLogout();
-        } catch (err) {
-            this.emitter.emit(UserServiceEvent.USER_LOGOUT_ERROR, err);
-            return;
-        }
-
+    logoutUser(): void {
         this.userRepository.setLoggedInUser(undefined);
         this.emitter.emit(UserServiceEvent.USER_LOGGED_OUT);
     }

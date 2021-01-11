@@ -18,6 +18,20 @@
             </template>
 
             <template #toolbar="{ toolbarItemClass }">
+                <template
+                        v-if="user"
+                >
+                    <span>
+                        {{ user.firstName }} {{ user.lastName }}
+                    </span>
+
+                    <ui-icon-button
+                            @click="onLogoutButtonClick"
+                    >
+                        <i class="mdi mdi-exit-to-app"></i>
+                    </ui-icon-button>
+
+                </template>
                 <slot
                         name="toolbar"
                         v-bind="{
@@ -51,8 +65,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { networkTrackingService } from '@/dependencies';
+import { networkTrackingService, userService } from '@/dependencies';
 import { NetworkTrackerEvent } from '@/services/NetworkTrackingService';
+import User from '@/models/User';
 
 export default defineComponent({
     name: 'AppNavbar',
@@ -65,11 +80,13 @@ export default defineComponent({
         return {
             networkStatus: true as boolean,
             networkStatusCheckTime: 0 as number,
+            user: undefined as User | undefined,
         };
     },
     async mounted() {
         networkTrackingService.emitter.on(NetworkTrackerEvent.STATUS_CHANGE, this.onNetworkStateChange, this);
         this.onNetworkStateChange();
+        this.user = await userService.getLoggedInUser();
     },
     beforeUnmount() {
         networkTrackingService.emitter.off(NetworkTrackerEvent.STATUS_CHANGE, this.onNetworkStateChange);
@@ -84,6 +101,9 @@ export default defineComponent({
         },
         onOfflineTextClick() {
             networkTrackingService.checkServerConnection(true);
+        },
+        onLogoutButtonClick() {
+            userService.logoutUser();
         },
     },
 });

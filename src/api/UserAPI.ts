@@ -16,10 +16,6 @@ export default class UserAPI {
         return response.data as User;
     }
 
-    async postUserLogout(): Promise<void> {
-        await this.api.baseRequest.post('/user/logout');
-    }
-
     async getUser(): Promise<User> {
         const response = await this.api.baseRequest.get('/user');
         return response.data as User;
