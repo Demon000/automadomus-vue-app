@@ -50,6 +50,7 @@
                         </div>
                         <div
                                 class="property"
+                                v-if="area.hasImage !== undefined"
                         >
                             <div class="type">Has image</div>
                             <div class="value">{{ area.hasImage }}</div>
